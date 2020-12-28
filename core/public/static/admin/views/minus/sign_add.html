@@ -1,0 +1,63 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">签到任务</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-edit">
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">累计签到(天)</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="day" id="date1" autocomplete="off" lay-verify="required|number" class="layui-input"  placeholder="">
+
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">送(积分）</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="send" autocomplete="off" lay-verify="required|number" class="layui-input" placeholder="">
+                        </div>
+                    </div>
+                    <blockquote style="margin-left: 110px" class="layui-elem-quote">用户累计签到达到设置天数后将额外获得设置的积分</blockquote>
+
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="goods-cat-form-add-submit">立即提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin','layer','upload', 'form' , 'layedit' , 'formSelects'], function() {
+        var $        = layui.$
+            ,admin   = layui.admin
+            , upload = layui.upload
+            ,layer   = layui.layer
+            ,layedit = layui.layedit
+            ,formSelects = layui.formSelects
+            ,form    = layui.form;
+        form.on('submit(goods-cat-form-add-submit)', function(data){
+            $.post(config.url+'minus/sginAdd',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                            window.location.href =config.html_url+'minus/sign_list';
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            icon: 2
+                        })
+                    }
+                });
+            return false;
+        });
+
+
+    });
+</script>
+

@@ -1,0 +1,229 @@
+<style>
+  .goods_imgsd{
+    display: flex;
+  }
+  .goods_imgsd dd {
+    margin-left: 3px;
+  }
+</style>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">订单信息</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <!--<blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">*　必须得小程序发布且通过审核了才能正常发货！！！！*</blockquote>-->
+      <form class="layui-form layui-form-pane" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">退款单号</label>
+          <div class="layui-input-block">
+            <input type="text" name="order_code" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">订单号</label>
+          <div class="layui-input-block">
+            <input type="text" name="code" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">总退款金额</label>
+          <div class="layui-input-block">
+            <input type="text" name="price" disabled placeholder="￥" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">微信退款金额</label>
+          <div class="layui-input-block">
+            <input type="text" name="wx_price"  placeholder="￥" autocomplete="off" class="layui-input" style="color: red">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">余额退款金额</label>
+          <div class="layui-input-block">
+            <input type="text" name="balance" placeholder="￥" autocomplete="off" class="layui-input" style="color: red">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">退款人</label>
+          <div class="layui-input-block">
+            <input type="text" name="nickname" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">退款人电话</label>
+          <div class="layui-input-block">
+            <input type="text" name="mobile" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">团长</label>
+          <div class="layui-input-block">
+            <input type="text" name="cap_name" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">团长电话</label>
+          <div class="layui-input-block">
+            <input type="text" name="cap_mobile" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">退款原因</label>
+          <div class="layui-input-block">
+            <textarea type="text" name="content" disabled autocomplete="off"   class="layui-textarea">
+              
+            </textarea>
+            <div id="img">
+
+            </div>
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">标注说明</label>
+          <div class="layui-input-block">
+            <textarea type="text" name="text" lay-verify="required"  class="layui-textarea">
+            </textarea>
+          </div>
+        </div>
+
+        <table class="layui-hide" id="demo"></table>
+        <div class="layui-form-item" pane>
+          <ul class="layui-timeline"  id="each-list">
+
+          </ul>
+        </div>
+        <div class="layui-form-item" id="order-buttons">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="order-form-submit">同意</button>
+            <button class="layui-btn" lay-submit lay-filter="order-form-submit-pass">拒绝</button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    layui.use(['admin','layer','table','upload', 'form' , 'layedit'], function() {
+        var $ = layui.$
+            ,admin = layui.admin
+            , upload = layui.upload
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,form = layui.form;
+
+        var table = layui.table;
+        var router = layui.router();
+        var id = router.search.id;
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+
+        table.render({
+
+            elem: '#demo'
+            ,url: config.url+'order/returnDetailGoods&id='+id//数据接口
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [[
+                {field:'goods_name', title: '商品名称', width: 200}
+                ,{field:'goods_img', title: '封面图' , width: 100  ,templet:'<div><img width="50px" src="{{ d.goods_headimage }}"></div>'}
+                ,{field:'goods_num', title: '售后数量', width: 150}
+                ,{field:'norms', title: '规格'}
+
+
+            ]]
+        });
+        admin.req({
+            type:'POST',
+            url: config.url+'order/returnDetail'//数据接口
+            ,data:{"id":id},
+            done:function(res){
+                if(res.data){
+                  if(res.data.company_status>0){
+                    $('.layui-btn').hide();
+                  }
+                  console.log(res.data)
+
+                  var html = '';
+                  layui.each(res.data.imgs, function(index, item){
+                    console.log(item)
+                      html +='<img style="width: 510px;" src="'+item+'">';
+                  });
+                  $('#img').html(html);
+
+
+                  //预设元素
+                    form.val("component-form-group-xcx", {
+                        "order_code" : res.data.order_code,
+                        "code"       : res.data.code,
+                        "price"      : res.data.price.toFixed(2),
+                        "wx_price"   : res.data.wx_price.toFixed(2),
+                        "balance"    : res.data.balance,
+                        "nickname"   : res.data.nickname,
+                        "mobile"     : res.data.mobile,
+                        "cap_name"   : res.data.cap_name,
+                        "cap_mobile" : res.data.cap_mobile,
+                        "content"    : res.data.content,
+                        "text"       : res.data.text==0?'':res.data.text,
+                    });
+                    var list = '';
+                    layui.each(res.data.obrder_path, function(index, item){
+                        list += '<li class="layui-timeline-item"><i class="layui-icon layui-timeline-axis">&#xe63f;</i><div class="layui-timeline-content layui-text"><h3 class="layui-timeline-title">'+item[1]+item[0]+'</h3><p></p>';
+                        if(index == 0){
+                            list += '</p><p>收货信息：'+res.data.address_data.captain_text.address+'<br>小区名称：'+res.data.address_data.captain_text.homename+'<br>团长姓名：'+res.data.address_data.captain_text.username+'<br>团长电话：'+res.data.address_data.captain_text.mobile+'</p>';
+                        }
+                        list += '</div></li>';
+                    });
+                    $('#each-list').html(list);
+
+                }
+            }
+        });
+        layui.use('form', function() {
+            form.render();
+        });
+
+        /* 监听提交 */
+        form.on('submit(order-form-submit)', function(data){
+          layer.confirm('您确定要同意售后吗？', function(index){
+          data.field.id = id;
+            $.post(config.url+'order/refund',
+                data.field,
+                function(res){
+                    if(res.data == 200){
+                      layer.alert('退款成功! ≥ ▽ ≤', function(index){
+                        window.parent.layer.closeAll();
+                        window.parent.location.reload()
+                      });
+                    }else if(res.code ==1) {
+                      layer.alert(res.data, function(index){
+                        window.parent.layer.closeAll();
+                        window.parent.location.reload()
+                      });
+                    }
+                });
+            return false;
+          });
+        });
+
+      form.on('submit(order-form-submit-pass)', function(data){
+        layer.confirm('您确定要拒绝售后吗？', function(index){
+
+          data.field.id = id;
+        $.post(config.url+'order/noRefund',
+                data.field,
+                function(res){
+                  if(res.data= 200){
+                    layer.alert('审核成功! ≥ ▽ ≤', function(index){
+                      window.parent.layer.closeAll();
+                      window.parent.location.reload()
+                    });
+                  }
+                });
+            return false;
+        });
+      });
+
+    });
+</script>
+

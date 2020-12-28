@@ -1,0 +1,91 @@
+
+<title>充值记录</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>充值记录</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">充值记录</div>
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-bottom: 10px;">
+                        搜索：
+                        <div class="layui-inline">
+                            <input class="layui-input" placeholder="用户昵称" name="search" id="demoReload" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+                    </div>
+                    <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"></table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    layui.use(['admin', 'table'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,form    = layui.form;
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'user/getRecharge'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                {field:'nickname', title: '用户名'},
+                {field:'order_code', title: '订单号'},
+                {field:'recharge', title: '充值金额',templet:function (d) {
+                        return '<b style="color: red">¥'+d.recharge+'</b>';
+                    }},
+                {field:'send_cash', title: '赠送金额',templet:function (d) {
+                        return '<b style="color: red">¥'+d.send_cash+'</b>';
+                    }},
+                {field:'cash', title: '到账金额',templet:function (d) {
+                        return '<b style="color: red">¥'+d.cash+'</b>';
+                    }},
+                {field:'return_integral', title: '赠送积分'},
+                {field:'type', title: '充值类型'},
+                {field:'status', title: '充值状态'},
+                {field:'create_time', title: '充值时间'}
+            ]]
+        });
+
+
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+                console.log(demoReload)
+
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        search: demoReload.val()
+                    }
+                });
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+
+    });
+</script>

@@ -1,0 +1,148 @@
+
+<title>控制台</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>控制台</cite></a>
+    </div>
+</div>
+<style>
+    /*.icons{*/
+        /*width: 5rem;*/
+        /*height: 5rem;*/
+        /*float: left;*/
+        /*font-size: 3rem;*/
+        /*!*margin-right:3rem;*!*/
+        /*margin-left:2rem;*/
+
+        /*margin-top: 2rem;*/
+    /*}*/
+
+    /*.cons{*/
+        /*height: 10rem;*/
+    /*}*/
+    /*.font_s{*/
+        /*float: left;*/
+        /*margin-top: 4rem;*/
+
+
+    /*}*/
+</style>
+<div class="layui-fluid">
+    <script type="text/html" template lay-url="{{config.url}}Iindex/index">
+
+        <div class="layui-row layui-col-space15">
+        <div class="layui-col-sm6 layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    总收入
+                </div>
+
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p class="layuiadmin-big-font">¥ {{ d.data.all_view }}</p>
+                    <p>总成本<span class="layui-badge">{{ d.data.count_price}} </span></p>
+<!--                    <p>单位/元</p>-->
+                    <!--<p>总利润<span class="layui-badge"> {{ d.data.allyall_view }}</span></p>-->
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-col-sm6 layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    总利润
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p class="layuiadmin-big-font">{{ d.data.allyall_view }}</p>
+                    <p>单位/元</p>
+                    <!--<p>今日注册数量<span class="layui-badge"> {{ d.data.toadall_user }}</span></p>-->
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-sm6 layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    总佣金
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p class="layuiadmin-big-font">{{ d.data.fx_sum }}</p>
+                    <p>单位/元</p>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-sm6 layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    团长总数
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p class="layuiadmin-big-font">{{ d.data.all_cap }}</p>
+                    <p>今日新增团长 <span class="layui-badge">{{ d.data.toadyall_cap }} </span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </script>
+    <!--第二层  大框框-->
+    <div class="layui-row layui-col-space15">
+        <!--左边的-->
+        <div class="layui-col-sm6 layui-col-md8" style="height: 4rem">
+                <div class="layui-card">
+                    <div class="layui-card-body">
+                        <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-dataview" style="height: 4rem">
+                            <div carousel-item id="LAY-index-dataview">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!--新增订单-->
+            <div class="layui-card">
+                <div class="layui-tab layui-tab-brief layadmin-latestData">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">新增订单</li>
+                    </ul>
+                    <div class="layui-tab-content cons">
+                        <div class="layui-tab-item layui-show">
+                            <table id="LAY-index-topSearch"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/html" id="showimg">
+            <a class="layui-btn layui-btn-primary layui-btn-xs" data-type="{{ d.uid.headimage }}" id="showuserinfo" lay-event="detail"><i class="layui-icon">&#xe66f;</i>{{ d.uid.nickname }}</a>
+        </script>
+        <!--右边的-->
+        <div class="layui-col-md4">
+            <div class="layui-card">
+                <div class="layui-tab layui-tab-brief layadmin-latestData">
+                    <ul class="layui-tab-title">
+                        <!--<li class="layui-this">热卖商品排行榜</li>-->
+                        <li class="layui-this">团长销售排行榜</li>
+                        <li>用户消费排行榜</li>
+                    </ul>
+                    <div class="layui-tab-content">
+                        <!--<div class="layui-tab-item layui-show">-->
+                            <!--<table id="LAY-index-newest-user"></table>-->
+                        <!--</div>-->
+                        <div class="layui-tab-item layui-show">
+                            <table id="LAY-index-newest-vip"></table>
+                        </div>
+                        <div class="layui-tab-item">
+                            <table id="LAY-index-user-vip"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="application/javascript">
+    layui.use('console', layui.factory('console'));
+</script>
+

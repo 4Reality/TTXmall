@@ -1,0 +1,131 @@
+<button class="layui-btn layui-btn-normal layui-btn-sm" style="position: fixed;
+    z-index: 9999;
+        margin-left: 14px; margin-top: 2px;
+    background-color: #1e9fff9e;" onclick="javascript:history.back(-1);"><i class="layui-icon"></i>返回上一级</button>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>秒杀设置</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">秒杀设置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab">
+                <div class="layui-tab-content">
+                    <!--满减设置内容-->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">秒杀状态</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">活动期数</label>
+                                <div class="layui-input-block">
+                                    <select name="active_id" xm-select="select-supplier" lay-verify="required" disabled  xm-select-radio xm-select-search="" >
+                                        <option value="0" disabled="disabled"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">秒杀商品</label>
+                                <div class="layui-input-block">
+                                    <select name="goods_id" xm-select="select8" lay-verify="required" xm-select-search="">
+                                        <option value="0" disabled="disabled"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">开始时间 </label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="start_time" class="layui-input" lay-verify="required" id="start_time" placeholder="秒杀开始时间">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="minus-form-sbmiy">立即提交</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form' , 'laydate','formSelects'], function(){
+        //定义表单
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,formSelects = layui.formSelects
+            ,form = layui.form;
+        laydate.render({
+            elem: '#start_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+
+        });
+        var router = layui.router();
+        var id = router.search.id;
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+        admin.req({
+            type:'POST',
+            url: config.url+'minus/editSpike'//数据接口
+            ,data:{'id':id},
+            done:function(res){
+                // console.log(res)
+                if(res.data){
+                    //预设元素
+                    form.val("component-form-group-xcx", {
+                        "start_time": res.data.start_time,
+                        "status"    : (res.data.status) ? 1 : 0,
+                    });
+                    formSelects.data('select8', 'server', {
+                        url: config.url+'minus/getGoods&mid='+res.data.id,
+                        keyword: '',
+                    });
+                    formSelects.data('select-supplier', 'server', {
+                        url: config.url+'minus/getActive&mid='+res.data.id,
+                        keyword: '',
+                    });
+                }
+                formSelects.render();
+            }
+        });
+        form.render();
+        //监听提交
+        form.on('submit(minus-form-sbmiy)', function(data){
+            //发送请求
+            data.field.id = id;
+            admin.req({
+                type:'POST',
+                url: config.url+'minus/editSpike', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data==200){
+                        layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                            window.location.href =config.html_url+'minus/spike';
+                        });
+                    }
+                }
+            });
+        });
+
+    });
+</script>

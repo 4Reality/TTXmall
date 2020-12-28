@@ -1,0 +1,135 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">添加标签</div>
+      <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-add">
+        <div class="layui-form-item">
+          <label class="layui-form-label">标签名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required|lengthnow" autocomplete="off" placeholder="请输入标签名称" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">标签图片</label>
+          <div class="layui-upload">
+            <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button>
+            <div class="layui-upload-list del-image"  id="test-upload-normal-img"><ul></ul></div>
+            <!--<blockquote style="margin-left: 110px" class="layui-elem-quote">商品封面图尺寸200*200px 最多只能上传1.2M之内的图片</blockquote>-->
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-add-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script>
+
+      layui.use(['admin','layer','upload', 'form' , 'formSelects'], function() {
+          var $ = layui.$
+              ,admin = layui.admin
+              , upload = layui.upload
+              ,layer = layui.layer
+              ,formSelects = layui.formSelects
+              ,form = layui.form;
+          var layedit;
+          var router = layui.router();
+          var id = router.search.id;
+          if(typeof(id)=='undefined'){
+            id=0;//默认新增
+          }
+          layui.use('layedit', function(){
+             layedit = layui.layedit;
+              var url=config.url+'base_admin/upload';
+              index = layedit.build('goods_content',{
+                  height:300,
+                  uploadImage:{url: url, type: 'post'}
+
+              }); //建立编辑器
+          });
+          form.verify({
+              lengthnow: function(value){
+                  if(value.length > 20){
+                      return '商品至多只能是20字呀! ≥...≤!~';
+                  }
+              }
+          });
+          admin.req({
+            type:'POST',
+            url: config.url+'goods/editGoodsIcon'//数据接口
+            ,data:{"id":id},
+            done:function(res){
+              console.log(res)
+              if(res.data){
+                form.val("goods-cat-form-add", {
+                  "name": res.data.name,
+                });
+                if(res.data.img != ''){
+                  var str = '<dd><i class="layui-icon" >&#x1007;</i> <img  width="100px" src="'+res.data.img+'"> <p id="test-upload-demoText"></p><input type="hidden" name="img" value="'+res.data.img+'"></dd>';
+                  $('#test-upload-normal-img ul').append(str);
+                }
+              }
+
+              formSelects.render();
+            }
+          });
+          layui.use('form', function() {
+            form.render();
+          });
+          form.on('submit(goods-cat-form-add-submit)', function(data){
+              data.field.id = id;
+              $.post(config.url+'goods/editGoodsIcon',
+                  data.field,
+                  function(res){
+                     if(res.code == 0){
+                         layer.alert('修改成功! ≥ ▽ ≤', function(index){
+                             window.parent.layer.closeAll();
+                             window.parent.location.reload()
+                         });
+                     }else{
+                         layer.msg(res.data, {
+                             icon: 2
+                         })
+                     }
+                  });
+              return false;
+          });
+          $('.del-image').on('click','.layui-icon', function () {
+              $(this).parents('dd').remove();
+          });
+        var uploadInst = upload.render({
+          elem: '#test-upload-normal'
+          ,url: config.url+'base_admin/upload'
+          ,data:{"type":"picture"}
+          ,size: 1700 //限制文件大小，单位 KB
+          ,multiple: true
+          ,before: function(obj){
+            layer.load(0, {
+              offset: 'auto'
+            });
+          }
+          ,done: function(res){
+            //上传完毕
+            if (res.code > 0) {
+              return layer.msg('上传失败');
+            }
+            $('#test-upload-normal-img ul').empty();
+            var str = '<dd><i class="layui-icon">&#x1007;</i> <img  width="100px" src="'+res.data.src+'"> <p id="test-upload-demoText1"></p><input type="hidden" name="img" value="'+res.data.src+'" id="cover_value"></dd>';
+            $('#test-upload-normal-img ul').append(str)
+            layer.closeAll();
+          }
+          , error: function () {
+            //演示失败状态，并实现重传
+            var demoText = $('#test-upload-demoText1');
+            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+            demoText.find('.demo-reload').on('click', function () {
+              uploadInst.upload();
+            });
+          }
+        });
+      });
+  </script>
+

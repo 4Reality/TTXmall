@@ -1,0 +1,125 @@
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">余额设置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+
+            <form class="layui-form" action="" lay-filter="wechatconfig-form">
+
+
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">充值功能</label>-->
+                    <!--<div  class="layui-input-block">-->
+                        <!--<input class="open_rechage"  lay-filter="balance_status" type="radio"  name="wechat_config[rechage_status]" value="0" title="关闭">-->
+                        <!--<input class="close_rechage" lay-filter="balance_status" type="radio"  name="wechat_config[rechage_status]" value="1" title="开启">-->
+                        <!--<blockquote  class="layui-elem-quote">关闭后充值入口将被隐藏</blockquote>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">余额功能</label>
+                    <div  class="layui-input-block">
+                        <input class="open_balance"  lay-filter="balance_status" type="radio"  name="wechat_config[balance_status]" value="0" title="关闭">
+                        <input class="close_balance" lay-filter="balance_status" type="radio"  name="wechat_config[balance_status]" value="1" title="开启">
+                        <blockquote  class="layui-elem-quote">关闭后余额功能将不可用</blockquote>
+                    </div>
+
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">余额比列</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="wechat_config[balance]" lay-verify="required|number" autocomplete="off"  class="layui-input">
+                    </div>
+                    <span style="font-size: 20px;font-weight: 400;line-height: 38px;text-align: right;">%</span>
+                    <blockquote style="margin-left: 7rem;" class="layui-elem-quote" id="notice"></blockquote>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="captain-from-edit-submit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin','layer','form' , 'layedit' , 'formSelects'], function() {
+        var $            = layui.$
+            ,admin       = layui.admin
+            ,layer       = layui.layer
+            ,formSelects = layui.formSelects
+            ,form        = layui.form;
+        layui.use('form', function() {
+            form.render();
+        });
+        formSelects.data('cityid', 'server', {
+            url: config.url+'cities/selectlistAll',
+            keyword: '',
+        });
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'Userwallet/getSite',//数据接口
+            done:function(res) {
+                if (res.data) {
+                    console.log(res.data)
+                    var ds = '每个订单金额'+res.data.wechat_config.balance+'% 可用余额抵扣';
+                    $('#notice').text(ds);
+                    if(res.data.wechat_config.balance_status==0||res.data.wechat_config.hope==null){
+                        $('.open_balance').attr('checked','checked');
+                    }else if(res.data.wechat_config.balance_status==1){
+                        $('.close_balance').attr('checked','checked');
+                    }
+
+                    if(res.data.wechat_config.rechage_status==0){
+                        $('.open_rechage').attr('checked','checked');
+                    }else if(res.data.wechat_config.rechage_status==1){
+                        $('.close_rechage').attr('checked','checked');
+                    }
+                    var acr = String(res.data.wechat_config.cright);
+                    //预设元素
+                    form.val("wechatconfig-form", {
+                        "id": res.data.id,// "name": "value"
+                        "wechat_config[balance]"  : res.data.wechat_config.balance,// "name": "value"
+                        "wechat_config[reflect][3]": res.data.wechat_config.reflect[3]==3?1:0,// "name": "value"
+                        "wechat_config[reflect][1]": res.data.wechat_config.reflect[1]==1?1:0,// "name": "value"
+                        "wechat_config[reflect][2]": res.data.wechat_config.reflect[2]==2?1:0,// "name": "value"
+
+                    });
+
+                }
+            }
+        });
+
+        form.on('submit(captain-from-edit-submit)', function(data){
+
+            $.post(config.url+'User/SiteX',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.msg('添加成功! ≥ ▽ ≤', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                            ,end:function () {
+                                admin.events.refresh()
+                            }
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }
+                });
+            return false;
+        });
+
+
+    });
+</script>

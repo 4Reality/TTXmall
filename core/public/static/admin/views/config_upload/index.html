@@ -1,0 +1,248 @@
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>云储存配置</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">云储存配置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+                <div class="layui-tab-content">
+                    <!-- 上传配置-->
+                    <div class="layui-tab-item layui-show">
+                        <form class="layui-form" action="" onsubmit=" return  false"  lay-filter="wechatconfig-upload-form">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">选择服务器</label>
+                                <div class="layui-input-block">
+                                    <select id="test" name="oss" lay-filter="uploadchajian">
+                                        <option value=3>本地上传</option>
+                                        <option value=0>阿里云OSS上传</option>
+                                        <option value=1>七牛云上传</option>
+                                        <option value=2>腾讯云上传</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!--阿里元上传才显示出来-->
+                            <div id="aliyun_oss">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">仓库名称</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="al_bucket"  placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">accesskeyid</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="al_access_key_id"  placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">accesssecret</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="al_access_key_secret"   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">上传根目录</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="al_base_dir" placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">顶部文件管理的文件名</blockquote>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">自定义域名</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="al_use_http"   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">前面要带https:// 结尾不要加/</blockquote>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">endpoint</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="al_endpoint"  placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">前面要带https:// 结尾不要加/</blockquote>
+                                </div>
+                            </div>
+                            <!--七牛云上传才显示出来-->
+                            <div id="qiniuyun">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">AK</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="qn_accesskey" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SK</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="qn_secretkey" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">仓库名称</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="qn_bucket" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">自定义域名</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="qn_use_http" required   placeholder="" autocomplete="off" class="layui-input">
+                                        <blockquote class="layui-elem-quote">域名前面要加http://</blockquote>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--腾讯云上传才显示出来-->
+                            <div id="tenxunyun">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">APPID</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="tx_appid" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SECRETID</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="tx_secretid" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SECRETKEY</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="tx_secretkey" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">仓库名称</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="tx_bucket" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">仓库地域</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="tx_region" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">仓库域名</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="tx_use_http" required   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="wechatconfig-upload-form-submit">立即提交</button>
+                                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form'], function() {
+        //定义表单
+        var $ = layui.$
+            , admin = layui.admin
+            , element = layui.element
+            , layer = layui.layer
+            , form = layui.form;
+        //隐藏
+        $('#aliyun_oss').hide();
+        $('#qiniuyun').hide();
+        $('#tenxunyun').hide();
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'config_upload/index',//数据接口
+            done:function(res) {
+                if (res.data) {
+                    form.val("wechatconfig-upload-form", {
+                        "id": res.data.id,// "name": "value"
+                        "al_bucket": res.data.al_bucket,
+                        "al_access_key_id": res.data.al_access_key_id,
+                        "al_access_key_secret": res.data.al_access_key_secret,
+                        "al_base_dir": res.data.al_base_dir,
+                        "al_use_http": res.data.al_use_http,
+                        "al_endpoint": res.data.al_endpoint,
+                        "qn_accesskey": res.data.qn_accesskey,
+                        "qn_secretkey": res.data.qn_secretkey,
+                        "qn_bucket": res.data.qn_bucket,
+                        "qn_use_http": res.data.qn_use_http,
+                        "tx_appid": res.data.tx_appid,
+                        "tx_secretid": res.data.tx_secretid,
+                        "tx_secretkey": res.data.tx_secretkey,
+                        "tx_bucket": res.data.tx_bucket,
+                        "tx_region": res.data.tx_region,
+                        "tx_use_http": res.data.tx_use_http,
+                        "oss": res.data.oss,
+                    });
+
+                    if (res.data.oss == 0) {
+                        $('#aliyun_oss').show();
+                    }
+                    if (res.data.oss == 1) {
+                        $('#qiniuyun').show();
+                    }
+                    if (res.data.oss == 2) {
+                        $('#tenxunyun').show();
+                    }
+                    // $("#pay-sel").val(1);
+                    //富文本编辑框内容的回显
+                    // layedit.setContent(index,res.data.index_text);
+
+                }
+            }
+        });
+        //选择下拉框 联动
+        form.on('select(uploadchajian)', function(data){
+            console.log(data.elem); //得到select原始DOM对象
+            console.log(data.value); //得到被选中的值
+            console.log(data.othis); //得到美化后的DOM对象
+            if(data.value==0){//选择阿里云
+                $('#aliyun_oss').show();
+                $('#qiniuyun').hide();
+                $('#tenxunyun').hide();
+            }else if(data.value==1){
+                $('#aliyun_oss').hide();
+                $('#qiniuyun').show();
+                $('#tenxunyun').hide();
+            }else if(data.value==2){
+                $('#aliyun_oss').hide();
+                $('#qiniuyun').hide();
+                $('#tenxunyun').show();
+            } else if(data.value==3){
+                $('#aliyun_oss').hide();
+                $('#qiniuyun').hide();
+                $('#tenxunyun').hide();
+            }
+        });
+
+
+        //监听提交
+        form.on('submit(wechatconfig-upload-form-submit)', function(data){
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'config_upload/uploadEdit', //数据接口
+                data:data.field,
+                done:function(res){
+                    layer.msg('修改成功', {
+                        offset: '15px'
+                        ,icon: 1
+                        ,time: 1000
+                    });
+                }
+            });
+        });
+    });
+</script>

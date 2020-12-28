@@ -1,0 +1,89 @@
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">充值设置</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-edit">
+        <div class="layui-form-item">
+          <label class="layui-form-label">充值金额</label>
+          <div class="layui-input-block">
+            <input type="text" name="recharge" lay-verify="required|number" autocomplete="off"  class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">赠送金额</label>
+          <div class="layui-input-block">
+            <input type="text" name="return_money" lay-verify="required|number" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">赠送积分</label>
+          <div class="layui-input-block">
+            <input type="text" name="return_integral" lay-verify="required|number" autocomplete="off"  class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">设置状态</label>
+          <div class="layui-input-inline" style="width:70px">
+            <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭" lay-filter="status">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-edit-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['admin','layer','upload', 'form' , 'layedit' , 'formSelects'], function() {
+    var $        = layui.$
+        ,admin   = layui.admin
+        ,layer   = layui.layer
+        ,layedit = layui.layedit
+        ,form    = layui.form;
+    var router   = layui.router();
+    var id       = router.search.id;
+    if(typeof(id)=='undefined'){
+      id=0;//默认新增
+    }
+    admin.req({
+      type:'POST',
+      url: config.url+'user/rechargeEdit'//数据接口
+      ,data:{"id":id},
+      done:function(res){
+        if(res.data){
+          form.val("goods-cat-form-edit", {
+            "recharge"       : res.data.recharge,
+            "return_money"   : res.data.return_money,
+            "return_integral": res.data.return_integral,
+            "status"         : (res.data.status) ? 1 : 0,
+          });
+        }
+        formSelects.render();
+      }
+    });
+    layui.use('form', function() {
+      form.render();
+    });
+    form.on('submit(goods-cat-form-edit-submit)', function(data){
+      data.field.id = id;
+      $.post(config.url+'user/rechargeEdit',
+          data.field,
+          function(res){
+            if(res.code == 0){
+              layer.alert('修改成功! ≥ ▽ ≤', function(index){
+                  window.parent.layer.closeAll();
+                  window.parent.location.reload()
+              });
+            }else{
+              layer.alert(res.data);
+            }
+          });
+      return false;
+    });
+  });
+
+</script>
+

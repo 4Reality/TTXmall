@@ -1,0 +1,236 @@
+<style>
+  .goods_imgsd{
+    display: flex;
+  }
+  .goods_imgsd dd {
+    margin-left: 3px;
+  }
+</style>
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">订单信息</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form layui-form-pane" action="" onsubmit=" return  false" lay-filter="component-form-group-printer">
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">订单号</label>
+          <div class="layui-input-block">
+            <input type="text" name="order_code" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">支付金额</label>
+          <div class="layui-input-block">
+            <input type="text" name="pay_price" disabled placeholder="￥" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">余额支付</label>
+          <div class="layui-input-block">
+            <input type="text" name="balance" disabled placeholder="￥" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane >
+          <label class="layui-form-label">优惠券信息</label>
+          <div class="layui-input-block">
+            <input type="text" name="coupon" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane >
+          <label class="layui-form-label">秒杀订单</label>
+          <div class="layui-input-block">
+            <input type="text" name="is_spike" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane >
+          <label class="layui-form-label">商品类型</label>
+          <div class="layui-input-block">
+            <input type="text" name="is_virtual" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane >
+          <label class="layui-form-label">使用积分</label>
+          <div class="layui-input-block">
+            <input type="text" name="use_integral" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane >
+          <label class="layui-form-label">赠送积分</label>
+          <div class="layui-input-block">
+            <input type="text" name="send_integral" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">派送方式</label>
+          <div class="layui-input-block">
+            <input type="text" name="lift" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane id="freights">
+          <label class="layui-form-label">配送费</label>
+          <div class="layui-input-block">
+            <input type="text" name="freight" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane id="storey">
+          <label class="layui-form-label">楼层信息</label>
+          <div class="layui-input-block">
+            <input type="text" name="storey" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane id="delivery_datas">
+          <label class="layui-form-label">配送时间段</label>
+          <div class="layui-input-block">
+            <input type="text" name="delivery_data" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">用户名</label>
+          <div class="layui-input-block">
+            <input type="text" name="nickname" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">联系电话</label>
+          <div class="layui-input-block">
+            <input type="text" name="user_mobile" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">留言信息</label>
+          <div class="layui-input-block">
+            <input type="text" name="order_text" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+
+        <table class="layui-hide" id="demo"></table>
+        <div class="layui-form-item" pane>
+          <ul class="layui-timeline"  id="each-list">
+          </ul>
+        </div>
+        <div class="layui-form-item" id="order-buttons" style="text-align: center">
+          <div class="layui-input-block"  style="margin-left: 0;">
+            <button class="layui-btn layui-btn-lg" lay-submit lay-filter="order-form-printer-submit">打印</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    layui.use(['admin','layer','table','upload', 'form' , 'layedit'], function() {
+        var $ = layui.$
+            ,admin = layui.admin
+            , upload = layui.upload
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,form = layui.form;
+
+        var table = layui.table;
+        var router = layui.router();
+        var id = router.search.id;
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+
+        table.render({
+            elem: '#demo'
+            ,url: config.url+'order/readGoods'//数据接口
+            ,where:{
+                'id':id
+            }
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [[
+                {field:'goods_name', title: '商品名称', width: 200}
+                ,{field:'price', title: '单价', width: 150}
+                ,{field:'goods_num', title: '数量', width: 150}
+                ,{field:'', title: '金额' ,templet:function (d) {
+                        return d.price * d.goods_num
+                    }}
+            ]]
+        });
+        admin.req({
+            type:'POST',
+            url: config.url+'order/printer'//数据接口
+            ,data:{"id":id},
+            done:function(res){
+                if(res.data){
+                  if(res.data.lift==0){
+                    $('#freights').hide();
+                    $('#storey').hide();
+                    $('#delivery_datas').hide();
+
+                  }
+                    //预设元素
+                    form.val("component-form-group-printer", {
+                        "order_code" : res.data.order_code,
+                        "pay_price"  : res.data.pay_price,
+                        "nickname"   : res.data.address_data.nickname,
+                        "user_mobile": res.data.address_data.mobile,
+                        "storey"     : res.data.address_data.storey,
+                        "lift"       : res.data.lift_text,
+                        "delivery_data": res.data.delivery_data_time?res.data.delivery_data_time:'',
+                        "freight"    : res.data.freight,
+                        "order_text" : res.data.order_text,
+                        "is_spike"   : res.data.is_spike==1?'是':'否',
+                        "is_virtual" : res.data.is_virtual==1?'虚拟商品':'普通商品',
+                        "use_integral" : res.data.use_integral,
+                        "send_integral" : res.data.send_integral,
+                        "balance" : res.data.balance,
+                        "coupon"     : res.data.coupon?res.data.coupon.coupon_name+res.data.coupon.discount:'未使用优惠券',
+                    });
+                }
+            }
+        });
+        layui.use('form', function() {
+            form.render();
+        });
+
+        /* 监听提交 */
+        form.on('submit(order-form-printer-submit)', function(data){
+            data.field.id = id;
+            data.field.printer = 1;
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'order/printer', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data.code != true){
+                        var msg = '';
+                        switch(res.data.msg){
+                            case -1:
+                                msg = '打印配置有误:接口名称错误';
+                                break;
+                            case -2:
+                                msg = '打印配置有误:该帐号未注册';
+                                break;
+                            case -3:
+                                msg = '打印配置有误:签名错误';
+                                break;
+                            case 1001:
+                                msg = '打印配置有误:打印机编号不合法';
+                                break;
+                        }
+                        layer.msg(msg, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }else{
+                        layer.msg('打印成功啦! ≥ ▽ ≤', {
+                            offset: 'auto'
+                            , icon: 1
+                            , time: 1000
+                            ,end:function () {
+                                window.parent.layer.closeAll();
+                                window.parent.location.reload()
+                            }
+                        })
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+

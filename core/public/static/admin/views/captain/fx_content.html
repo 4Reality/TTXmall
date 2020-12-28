@@ -1,0 +1,87 @@
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">分销设置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" action="" lay-filter="wechatconfig-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">团长等级分销</label>
+                    <div  class="layui-input-block">
+                        <input class="open_balance"  lay-filter="is_cap_cash" type="radio"  name="is_cap_cash" value="0" title="关闭">
+                        <input class="close_balance" lay-filter="is_cap_cash" type="radio"  name="is_cap_cash" value="1" title="开启">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="captain-from-edit-submit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin','layer','form' , 'layedit' , 'formSelects'], function() {
+        var $ = layui.$
+            ,admin = layui.admin
+            ,layer = layui.layer
+            ,formSelects = layui.formSelects
+            ,form = layui.form;
+        layui.use('form', function() {
+            form.render();
+        });
+        formSelects.data('cityid', 'server', {
+            url: config.url+'cities/selectlistAll',
+            keyword: '',
+        });
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'captain/fxContent',//数据接口
+            done:function(res) {
+                if (res.data) {
+                    console.log(res.data)
+                    if(res.data.is_cap_cash==0||res.data.is_cap_cash==null){
+                        $('.open_balance').attr('checked','checked');
+                    }else if(res.data.is_cap_cash==1){
+                        $('.close_balance').attr('checked','checked');
+                    }
+                    //预设元素
+                    form.val("wechatconfig-form", {
+                        "id": res.data.id,// "name": "value"
+
+                    });
+
+                }
+            }
+        });
+        form.on('submit(captain-from-edit-submit)', function(data){
+            $.post(config.url+'captain/fxContent',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.msg('添加成功! ≥ ▽ ≤', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                            ,end:function () {
+                                admin.events.refresh()
+                            }
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }
+                });
+            return false;
+        });
+
+
+    });
+</script>

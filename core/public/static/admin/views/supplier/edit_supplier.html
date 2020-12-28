@@ -1,0 +1,94 @@
+<style>
+  .goods_imgsd{
+    display: flex;
+  }
+  .goods_imgsd dd {
+    margin-left: 3px;
+  }
+</style>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">供应商信息</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <!--<blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">*　必须得小程序发布且通过审核了才能正常发货！！！！*</blockquote>-->
+      <form class="layui-form layui-form-pane" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">供应商姓名</label>
+          <div class="layui-input-block">
+            <input type="text" name="username" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">地址</label>
+          <div class="layui-input-block">
+            <input type="text" name="address" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">手机号</label>
+          <div class="layui-input-block">
+            <input type="text" name="mobile"autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" id="order-buttons">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="order-form-submit">提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    layui.use(['admin','layer','table','upload', 'form' , 'layedit'], function() {
+        var $        = layui.$
+            ,admin   = layui.admin
+            , upload = layui.upload
+            ,layer   = layui.layer
+            ,layedit = layui.layedit
+            ,form    = layui.form;
+        var table    = layui.table;
+        var router   = layui.router();
+        var id = router.search.id;
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+        admin.req({
+            type:'POST',
+            url: config.url+'supplier/editInfo'//数据接口
+            ,data:{"id":id},
+            done:function(res){
+                if(res.data){
+                    form.val("component-form-group-xcx", {
+                        "username": res.data.username,
+                        "address" : res.data.address,
+                        "mobile"  : res.data.mobile,
+                    });
+                }
+            }
+        });
+        layui.use('form', function() {
+            form.render();
+        });
+
+        /* 监听提交 */
+        form.on('submit(order-form-submit)', function(data){
+          layer.confirm('您确定要修改供应商吗？', function(index){
+          data.field.id = id;
+            $.post(config.url+'supplier/editInfo',
+                data.field,
+                function(res){
+                    layer.alert('修改成功! ≥ ▽ ≤', function(index){
+                      window.parent.layer.closeAll();
+                      window.parent.location.reload()
+                    });
+                });
+            return false;
+          });
+        });
+
+
+    });
+</script>
+

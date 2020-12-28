@@ -1,0 +1,59 @@
+<button class="layui-btn layui-btn-normal layui-btn-sm" style="position: fixed;
+    z-index: 9999;
+        margin-left: 14px; margin-top: 2px;
+    background-color: #1e9fff9e;" onclick="javascript:history.back(-1);"><i class="layui-icon"></i>返回上一级</button>
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">添加滚动图</div>
+      <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="notice-from">
+        <div class="layui-form-item">
+          <label class="layui-form-label">公告</label>
+          <div class="layui-input-block">
+            <input type="text" name="notice_content" lay-verify="required" autocomplete="off" placeholder="请输入公告" class="layui-input">
+          </div>
+        </div>
+        <!--<div class="layui-form-item">
+          <label class="layui-form-label">跳转链接</label>
+          <div class="layui-input-block">
+            <input type="text" name="link" lay-verify="required" autocomplete="off" placeholder="请输入跳转链接" class="layui-input">
+          </div>
+        </div>-->
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="notice-from-add-submit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script>
+      layui.use(['admin','layer','upload', 'form'], function() {
+          var $ = layui.$
+              ,admin = layui.admin
+              , upload = layui.upload
+              ,layer = layui.layer
+              ,form = layui.form;
+          /* 监听提交 */
+          form.on('submit(notice-from-add-submit)', function(data){
+              // data.field.goods_content = layedit.getContent(editIndex);
+              $.post(config.url+'app_notice/add',
+                  data.field,
+                  function(res){
+                     if(res.code == 0){
+                         layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                             window.location.href =config.html_url+'app_notice/index';
+                         });
+                     }else{
+                         layer.msg(res.data, {
+                             icon: 2
+                         })
+                     }
+              });
+              return false;
+          });
+      });
+  </script>
+

@@ -1,0 +1,97 @@
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-bottom: 10px;">
+                        搜索：
+                        <div class="layui-inline">
+                            <input class="layui-input" placeholder="姓名/电话" name="search" id="demoReload" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+                    </div>
+                    <table class="layui-hide" id="capuser-table-autowidth" lay-filter="capuser-table-autowidth"></table>
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-btn-normal layui-btn-xs"   lay-event="uselect"><i class="layui-icon">&#xe605;</i>选择</a>
+                    </script>
+                    <script type="text/html" id="radioTpl">
+                        <input type="radio" name="rradio" class="dsadas"  data-alt ="用户ID:{{d.id}} - 昵称:{{(d.nickname == '') ? '暂无用户信息':d.nickname}}"  value="{{d.id}}" title=" " lay-filter="radiodemo">
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin', 'table'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,form = layui.form;
+
+        var tableIns = table.render({
+            elem: '#capuser-table-autowidth'
+            ,url: config.url+'captain/selectuser'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                {field: 'id', title: '选择',templet:"#radioTpl",unresize:true,width:60},
+                {field:'id', title: '用户ID',width:100},
+                {field:'nickname', title: '用户名',width:200 ,templet:function (d) {
+                        if(d.nickname == '')
+                            return '暂无用户信息';
+                        else
+                            return d.nickname;
+                    }},
+                {field:'headimage', title: '头像' , width: 100  ,templet:'<div><img width="50px" src="{{ d.headimage }}"></div>'},
+                {field:'mobile', title: '手机号'},
+            ]]
+
+        });
+        table.on('row(capuser-table-autowidth)', function(obj){
+            id = obj.data.id;
+            alt = $(obj.tr.selector + ' input').data('alt');
+           $('.dsadas[value="'+id+'"]').prop("checked",true);
+            window.parent.document.getElementById('searchUid').value = alt;
+            window.parent.document.getElementById('obsearchUid').value = id;
+            form.render('radio');
+        });
+        form.on("radio(radiodemo)",function(obj) {
+            alt = $(obj.elem).data('alt');
+            window.parent.document.getElementById('searchUid').value = alt;
+            window.parent.document.getElementById('obsearchUid').value = obj.value;
+        });
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        search: demoReload.val()
+                    }
+                });
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+      /*  var uid = '';
+        table.on('tool(test-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event == 'uselect'){
+                uid = 1;
+                parent.layer.closeAll();1
+            }
+        });*/
+    });
+</script>

@@ -1,0 +1,43 @@
+
+
+<title>报名管理</title>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+
+    <div class="layui-card-body">
+      <!--<div style="padding-bottom: 10px;">
+        <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
+        <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
+      </div>-->
+
+      <table id="baoming_list"></table>
+
+
+    </div>
+  </div>
+</div>
+
+<script>
+
+  //alert(config.v);
+
+layui.use(['admin', 'table'], function(){
+  var $ = layui.$
+  ,table = layui.table
+  ,form = layui.form;
+
+  table.render({
+    elem: '#baoming_list'
+    ,url:'/web/index.php?c=home&a=welcome&do=ext&m=longbing_cardcloud&version_id=19&s=/admin/baoming/index'
+    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+    ,cols: [[
+      {field:'id', width:80,title: 'ID'}
+      ,{field:'name',  title: '用户名'}
+      ,{field:'phone',  title: '电话'}
+    ]]
+    ,page: {limit : 1 }
+  });
+
+});
+</script>

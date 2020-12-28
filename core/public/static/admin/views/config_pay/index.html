@@ -1,0 +1,155 @@
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>支付配置</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">支付配置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+                <div class="layui-tab-content">
+                    <!--小程序配置内容-->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="wechatconfig-form">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">选择支付</label>
+                                <div class="layui-input-block">
+                                    <select name="pay_config[pay_type"  id="pay-sel" lay-filter="pay_config">
+                                        <option value=0>微信</option>
+                                        <!--<option value=1>支付宝</option>-->
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="pay_config">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">商户号</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="mch_id" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">支付秘钥</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="pay_key" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">cert_path</label>
+                                    <div class="layui-upload">
+                                        <button type="button" class="layui-btn layui-btn-normal test-upload-normal-payre">上传文件</button>
+                                        <div class="layui-upload-list" id="cert_path"><span style="margin-left: 112px;" ><input type="hidden" name="cert_path" value=""/></span></div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">key_path</label>
+                                    <div class="layui-upload">
+                                        <button type="button" class="layui-btn layui-btn-normal test-upload-normal-payre">上传文件</button>
+                                        <div class="layui-upload-list"  id="key_path"><span style="margin-left: 112px;"></span><input type="hidden" name="key_path" value=""/></div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button class="layui-btn" lay-submit lay-filter="wechatconfig-form-submit">立即提交</button>
+                                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form'], function() {
+        //定义表单
+        var $ = layui.$
+            , admin = layui.admin
+            , element = layui.element
+            , layer = layui.layer
+            , form = layui.form;
+        //富文本编辑器 初始化
+        var layedit;
+        var index;
+        var ci = $('#cright-content');
+        layui.use('layedit', function () {
+            layedit = layui.layedit;
+            var url = config.url + 'base_admin/upload?type=picture';//图片上传路径
+            index = layedit.build('demo', {
+                height: 600,
+                uploadImage: {url: url, type: 'post'},
+            }); //建立编辑器
+        });
+
+        //查询配置
+        admin.req({
+            type: 'POST',
+            url: config.url + 'config_pay/index',//数据接口
+            done: function (res) {
+                if (res.data) {
+                    //预设元素
+                    form.val("wechatconfig-form", {
+                        "id": res.data.id,
+                        "pay_type": res.data.pay_type,// 商户号
+                        "mch_id": res.data.mch_id,// 商户号
+                        "cert_path": res.data.cert_path,// 商户号
+                        "key_path": res.data.key_path,// 商户号
+                        "pay_key": res.data.pay_key,// 支付密钥
+                    });
+                    $('#cert_path span').html(res.data.cert_path);
+                    $('#key_path span').html(res.data.key_path);
+                }
+            }
+        });
+        /*上传cert_path*/
+        layui.use(['admin', 'upload'], function () {
+            var $ = layui.jquery
+                , upload = layui.upload;
+            //单图片上传
+            var uploadInst = upload.render({
+                elem: '.test-upload-normal-payre'
+                , accept: 'file'
+                , url: config.url + 'config_pay/creupload'//上传地址
+                , data: ''
+                /*, before: function (obj) {
+                    layer.load(0, {
+                        offset: 'auto'
+                    });
+                }*/
+                , done: function (res) {
+                    //如果上传失败
+                    if (res.code > 0) {
+                        return layer.msg('上传失败');
+                    }
+                    $obj = $(this.item[0].parentNode.childNodes[4]);
+                    $obj.empty();
+                    $inputsa  = $(this.item[0].parentNode.childNodes[4]).attr('id');
+                    $obj.html('<span style="margin-left: 112px;" >'+res.data+'<input type="hidden" name="'+$inputsa+'" value="'+res.data+'"/></span>');
+                    layer.closeAll();
+                }
+            });
+        });
+        //监听提交
+        form.on('submit(wechatconfig-form-submit)', function (data) {
+            // console.log(data.field);
+            //发送请求
+            admin.req({
+                type: 'POST',
+                url: config.url + 'config_pay/save', //数据接口
+                data: data.field,
+                done: function (res) {
+                    layer.msg('修改成功', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+    });
+</script>

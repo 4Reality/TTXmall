@@ -1,0 +1,285 @@
+<style>
+    .diy-header{
+        height: 270px;
+        /*line-height: 80px;*/
+    }
+    .diy-header .header-title-top{
+        font-size:30px;
+        padding-top: 20px;
+        margin-left: 10px;
+    }
+    .diy-header .header-title-bottom{
+        line-height: 20px;
+        margin-top: 12px;
+        margin-left: 10px;
+    }
+    .diy-header .header-title-bottom ul li{
+        float: left;
+        margin-right: 22px;
+    }
+    .diy-header .header-title b{
+        color: #009688;
+    }
+    .grid-demo{
+        background-color: #F0F0F0;
+    }
+    .layui-col-md3{
+        width: 16%;
+        margin-left: 10px;
+        margin-top: 20px;
+    }
+    .layui-card-header .layui-icon{
+        position: inherit;
+    }
+    .grid-demo .grid-cards p:nth-child(2){
+        color: #FF5722;
+        font-size: 30px;
+    }
+    .grid-demo .grid-cards{
+        padding: 10px 20px;
+    }
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>活动管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header diy-header">
+                    <div class="header-title">
+                        <div class="header-title-top">
+                            <span>当前活动统计</span>
+                            <b></b>
+                            <button class="layui-btn" id="clicknowatv">查看详情</button>
+                        </div>
+                        <div class="header-title-bottom">
+                            <ul>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="layui-row layui-col-space1">
+                        <div class="layui-col-md3">
+                            <div class="grid-demo grid-demo-bg1">
+                                <div class="grid-cards">
+                                    <p class="layuiadmin-normal-font"><i class="layui-icon">&#xe657;</i>总订单量(个)</p>
+                                    <p class="layuiadmin-big-font" id="sum_order"></p>
+                                    <p>取消订单： <span class="layui-badge" id="sum_qx_order"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md3">
+                            <div class="grid-demo">
+                                <div class="grid-cards">
+                                    <p class="layuiadmin-normal-font"><i class="layui-icon">&#xe65e;</i>总收入</p>
+                                    <p class="layuiadmin-big-font" id="sum_pay_price"></p>
+                                    <p>-</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md3">
+                            <div class="grid-demo grid-demo-bg1">
+                                <div class="grid-cards">
+                                    <p class="layuiadmin-normal-font"><i class="layui-icon">&#xe65e;</i>总利润</p>
+                                    <p class="layuiadmin-big-font" id="sum_profit_price"></p>
+                                    <p>-</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md3">
+                            <div class="grid-demo">
+                                <div class="grid-cards">
+                                    <p class="layuiadmin-normal-font"><i class="layui-icon">&#xe65e;</i>总成本</p>
+                                    <p class="layuiadmin-big-font" id="sum_count_price"></p>
+                                    <p>-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+<!--                <div class="container-fluid footer text-center" role="footer">-->
+<!--                    <div class="friend-link">-->
+<!--                        <a href="http://www.w7.cc">微信开发</a>-->
+<!--                        <a href="http://s.w7.cc">微信应用</a>-->
+<!--                        <a href="http://bbs.w7.cc">微擎论坛</a>-->
+<!--                        <a href="http://s.w7.cc">联系客服</a>-->
+<!--                    </div>-->
+<!--                    <div class="copyright">Powered by <a href="http://www.w7.cc"><b>微擎</b></a> v2.0.1 © 2014-2018 <a href="http://www.w7.cc">www.w7.cc</a></div>-->
+<!--                </div>-->
+
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="activity-table-autowidth" lay-filter="activity-table-autowidth"></table>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn is_city_id" lay-event="allsend" id="add-activity">
+                                <i class="layui-icon">&#xe654;</i>添加团购活动
+                            </button>
+                        </div>
+                    </script>
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" id="aa" lay-event="detailGoods">活动商品管理</a>
+                        <!--
+                        {{ (d.status == 0) ? '<a class="layui-btn layui-btn-disabled  layui-btn-xs">添加活动商品</a>' : '<a class="layui-btn  layui-btn-xs"  lay-event="addgoods">添加活动商品</a>' }}-->
+                        {{ (d.status == 0) ?'<a class="layui-btn layui-btn-disabled  layui-btn-xs is_city_id">编辑</a>' : '<a class="layui-btn layui-btn-xs is_city_id"  lay-event="edit-activity">编辑</a>' }}
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail-activity">活动统计</a>
+                        <a class="layui-btn layui-btn-primary layui-btn-xs is_city_id" lay-event="del-activity">删除</a>
+                        <!--<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="del-activity">导出</a>-->
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin', 'table'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,form    = layui.form;
+        var tableIns = table.render({
+            elem: '#activity-table-autowidth'
+            ,url: config.url+'activity/index'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                // {checkbox: true},
+                {field:'id', title: '活动期数', width:100}
+                ,{field:'start_time', title: '开始时间', width:170, templet:function (d) {
+                        return layui.laytpl.toDateString(d.start_time *1000)
+                    }}
+                ,{field:'end_time', title: '结束时间', width:170, templet:function (d) {
+                        return layui.laytpl.toDateString(d.end_time *1000)
+                    }}
+                ,{field:'delivery_time', title: '配送时间', width:170, templet:function (d) {
+                        return layui.laytpl.toDateString(d.delivery_time *1000)
+                    }}
+                ,{field:'create_time', title: '创建时间', width:170, templet:function (d) {
+                        return layui.laytpl.toDateString(d.create_time *1000)
+                    }}
+                ,{field:'order_end_time', title: '自动取消订单时间', width:100, templet:function (d) {
+                        return d.order_end_time+'分钟'
+                    }}
+
+                ,{field:'status', title: '状态', width:100,templet: function(d){
+                        if(d.status == 0)
+                            return '<a class="layui-btn layui-btn-disabled layui-btn-xs">已结束</a>';
+                        else if(d.status == 1)
+                            return '<a class="layui-btn  layui-btn-danger layui-btn-xs">进行中</a>';
+                        else
+                            return '<a class="layui-btn  layui-btn-primary layui-btn-xs">待开始</a>';
+                    }}
+                ,{field:'open_auto', title: '商品强制开启状态', width:150,templet: function(d){
+                        if(d.open_auto == 1)
+                            return '自动开启';
+                        else
+                            return '团长手动开启';
+                    }}
+                ,{fixed: 'right', title:'操作', toolbar: '#rights',width:280}
+
+            ]]
+            ,done:function(res){
+                if(res.msg == 'urlsss'){
+                    window.location.href = config.html_url+'goods/add';
+                }else{
+                    $('.header-title-top b').html('第'+res.msg.atv.id+'期');
+                    $('.header-title-bottom ul li').eq(0).html('开始时间：'+layui.laytpl.toDateString(res.msg.atv.start_time *1000));
+                    $('.header-title-bottom ul li').eq(1).html('结束时间：'+layui.laytpl.toDateString(res.msg.atv.end_time *1000));
+                    $('.header-title-bottom ul li').eq(2).html('配送时间：'+layui.laytpl.toDateString(res.msg.atv.delivery_time *1000));
+                    $('#sum_order').html(res.msg.total_order);
+                    $('#sum_qx_order').html(res.msg.total_qx_order);
+                    $('#sum_pay_price').html('¥ ' + res.msg.ocount.sum_pay_price);
+                    $('#sum_profit_price').html('¥ ' + res.msg.ocount.sum_profit_price);
+                    $('#sum_count_price').html('¥ ' + res.msg.ocount.sum_count_price);
+                    var reurl = config.html_url+'activity/detail_activity/start_time='+res.msg.atv.start_time+'/end_time='+res.msg.atv.end_time+'/id='+res.msg.atv.id;
+                    $('#clicknowatv').attr('onclick' , 'window.location.href = "' + reurl + '"');
+                }
+                if(res.msg.is_city_id!=0){
+                    $('.is_city_id').hide();
+
+                }
+            }
+        });
+
+        table.on('tool(activity-table-autowidth)', function(obj){
+            var data = obj.data; //得到所在行所有键值
+            var id   = data.id;
+            if(obj.event === 'detailGoods') {
+                layer.open({
+                    type: 2
+                    , title: '添加' //不显示标题栏
+                    , closeBtn: false
+                    , area: ['980px', '750px']
+                    , shade: 0.8
+                    , shadeClose: true
+                    , id: 'LAY_layuipro'
+                    , btnAlign: 'c'
+                    , moveType: 1 //拖拽模式，0或者1
+                    , content: config.html_url + 'activity/activgoods/id=' + data.id + '/end_time='+data.end_time
+                });
+            }else if(obj.event === 'edit-activity'){
+                layer.open({
+                    type: 2,
+                    area: ['820px', '717px']
+                    ,shadeClose : true,
+                    title: '编辑活动',
+                    content: config.html_url + 'activity/edit/id='+data.id
+                });
+            }else if(obj.event === 'detail-activity'){
+                window.location.href = config.html_url+'activity/detail_activity/start_time='+obj.data.start_time+'/end_time='+obj.data.end_time+'/id='+obj.data.id;
+            }else if(obj.event === 'del-activity'){
+                layer.confirm('您确定要删除选择?', function(index){
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'activity/del'//数据接口
+                        , data: {
+                            "id": data.id,
+                        },
+                        done: function (res) {
+                            console.log(res)
+                            if(res.data==1){
+                                layer.msg('操作成功!', {
+                                    offset: '15px'
+                                    , icon: 1
+                                    , time: 2000
+                                });
+                                location.reload();
+                            }else {
+                                layer.msg('活动未结束!', {
+                                    offset: '15px'
+                                    , icon: 2
+                                    , time: 6000
+                                });
+
+                            }
+
+                        }
+                    });
+                });
+            }
+        });
+        //监听工具条
+        table.on('toolbar(activity-table-autowidth)', function(obj){
+            if(obj.event == 'allsend'){
+                layer.open({
+                    type: 2,
+                    area: ['820px', '717px']
+                    ,shadeClose : true,
+                    title: '添加的活动',
+                    content: config.html_url + 'activity/add'
+                });
+            }
+        });
+
+    });
+</script>

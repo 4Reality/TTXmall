@@ -1,0 +1,85 @@
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">升级团长</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-edit">
+        <div class="layui-form-item">
+          <label class="layui-form-label">团长等级</label>
+          <div class="layui-input-inline">
+            <select name="level" xm-select="level" lay-verify="required" xm-select-radio xm-select-search="">
+              <option value="0" disabled="disabled"></option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-edit-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  layui.use(['admin','layer','upload', 'form' , 'layedit' , 'formSelects'], function() {
+    var $ = layui.$
+            ,admin = layui.admin
+            , upload = layui.upload
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,formSelects = layui.formSelects
+            ,form = layui.form;
+
+    var router = layui.router();
+    var id = router.search.id;
+    if(typeof(id)=='undefined'){
+      id=0;//默认新增
+    }
+    //发送请求获取数据(数据的回显)
+    admin.req({
+      type:'POST',
+      url: config.url+'captain/editLevel'//数据接口
+      ,data:{"id":id},
+      done:function(res){
+        if(res.data){
+          //预设元素
+          form.val("goods-cat-form-edit", {
+
+          });
+          formSelects.data('level', 'server', {
+            type: "post",
+            url: config.url+'captain/selectLevel',
+            keyword: '',
+            data:{cap_id:res.data.id},
+          });
+        }
+        formSelects.render();
+      }
+    });
+    layui.use('form', function() {
+      form.render();
+    });
+    $('.del-image').on('click','.layui-icon', function () {
+      $(this).parents('dd').remove();
+    });
+    /* 监听提交 */
+    form.on('submit(goods-cat-form-edit-submit)', function(data){
+      data.field.id = id;
+      $.post(config.url+'captain/editLevel',
+              data.field,
+              function(res){
+                if(res.code == 0){
+                  layer.alert('修改成功! ≥ ▽ ≤', function(index){
+                      window.parent.layer.closeAll();
+                      window.parent.location.reload()
+                  });
+                }else{
+                  layer.alert(res.data);
+                }
+              });
+      return false;
+    });
+  });
+</script>
+

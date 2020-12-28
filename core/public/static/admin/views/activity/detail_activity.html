@@ -1,0 +1,353 @@
+<style>
+    .diy-header{
+        height: 130px;
+        /*line-height: 80px;*/
+    }
+    .diy-header .header-title-top{
+        font-size:30px;
+        padding-top: 20px;
+        margin-left: 10px;
+    }
+    .diy-header .header-title-bottom{
+        line-height: 20px;
+        margin-top: 12px;
+        margin-left: 10px;
+    }
+    .diy-header .header-title b{
+        color: #009688;
+    }
+    #diy-cent-body .diy-content{
+        width: 250px;
+        background: #F0F0F0;
+        display: inline-block;
+        margin-left: 15px;
+        padding: 20px;
+    }
+    #diy-cent-body .diy-content p:first-child{
+        font-size: 15px;
+    }
+
+    #diy-cent-body .diy-content p:nth-child(2){
+        color: #FF5722;
+    }
+    #diy-cent-body .diy-cent-right{
+        width: 650px;
+        display: inline-block;
+        margin-left: 100px;
+    }
+    #diy-cent-body .diy-cent-left{
+        width: 650px;
+        display: inline-block;
+    }
+</style>
+
+<div class="layui-fluid" >
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-xs">
+            <div class="layui-card">
+                <div class="layui-card-header diy-header">
+                    <div class="header-title">
+                        <div class="header-title-top">
+                            <b></b>
+                            <span>团购活动信息统计</span>
+                        </div>
+                        <div class="header-title-bottom">
+                            <span style="float: left;margin-right: 20px;">
+                                <ul>
+                                    <li></li>
+                                    <li></li>
+                                </ul>
+                            </span>
+                            <span>
+                                <button class="layui-btn"  onclick="javascript:history.back(-1);">返回列表</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-xs">
+            <div class="layui-card">
+                <div class="layui-card-header">数据统计</div>
+                <div class="layui-card-body  layuiadmin-card-list" id="diy-cent-body">
+                    <div class="diy-cent-left " style="width: 25rem" >
+                        <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-bin">
+                            <div carousel-item id="LAY-index-bin">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/html" template lay-url="{{ config.url + 'activity/detail_activity?id='+id+'&id='+id}}">
+                        <div class="diy-cent-right" >
+                            <div class="layui-card diy-content">
+                                <div class="layui-card-body">
+                                    <p class="layuiadmin-normal-font"><i class="layui-icon">&#xe657;</i>总订单量(个)</p>
+                                    <p class="layuiadmin-big-font">{{ d.data.total_order }}</p>
+                                    <p>取消订单： <span class="layui-badge">{{ d.data.total_qx_order }}</span></p>
+                                </div>
+                            </div>
+                            <div class="layui-card diy-content">
+                                <div class="layui-card-body">
+                                    <p class="layuiadmin-normal-font"><i class="layui-icon">&#xe66e;</i>总优惠劵数量(张)</p>
+                                    <p class="layuiadmin-big-font">{{ d.data.total_coupon }}</p>
+                                    <p>-</p>
+                                </div>
+                            </div>
+                            <div class="layui-card diy-content">
+                                <div class="layui-card-body">
+                                    <p class="layuiadmin-normal-font"><i class="layui-icon">&#xe66e;</i>新人券使用劵数量(张)</p>
+                                    <p class="layuiadmin-big-font">{{ d.data.total_newuser_coupon }}</p>
+                                    <p>-</p>
+                                </div>
+                            </div>
+                            <div class="layui-card diy-content">
+                                <div class="layui-card-body">
+                                    <p class="layuiadmin-normal-font"><i class="layui-icon">&#xe66e;</i>优惠劵使用数量(张)</p>
+                                    <p class="layuiadmin-big-font">{{ d.data.total_coupon_use }}</p>
+                                    <p>-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-xs3">
+            <div class="layui-card">
+                <div class="layui-card-header">城市排行</div>
+                <div class="layui-card-body">
+                    <table class="layui-table layuiadmin-page-table" lay-skin="line" id="LAY-index-cities"></table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-xs5">
+            <div class="layui-card">
+                <div class="layui-card-header">团长排行</div>
+                <div class="layui-card-body">
+                    <table class="layui-table layuiadmin-page-table" lay-skin="line" id="LAY-index-captain"></table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <div class="layui-card">
+                <div class="layui-card-header">商品排行</div>
+                <div class="layui-card-body">
+                    <table class="layui-table layuiadmin-page-table" lay-skin="line" id="LAY-index-goods"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="application/javascript">
+    var router     = layui.router();
+    var start_time = router.search.start_time;
+    var end_time   = router.search.end_time;
+    var id         = router.search.id;
+    layui.use(['admin', 'table'], function(){
+        var table  = layui.table;
+        var $      = layui.$
+            ,admin = layui.admin;
+        $('.header-title-bottom ul li').eq(0).html('开始时间：'+layui.laytpl.toDateString(start_time *1000));
+        $('.header-title-bottom ul li').eq(1).html('结束时间：'+layui.laytpl.toDateString(end_time *1000));
+        $('.header-title-top b').html('第'+id+'期');
+        //城市排行
+        table.render({
+            elem: '#LAY-index-cities'
+            ,url: config.url+'activity/citiesList'//最新的十条订单
+            // ,toolbar: '#toolbar'
+            ,where :{
+                'id':id
+            }
+            ,cellMinWidth: 80
+            ,defaultToolbar:false
+            ,page:true
+            ,cols: [[
+                {field:'city', title: '城市名' ,templet: '#showimg'},
+                {field:'count', title: '订单总数'},
+                {field:'pay_price', title: '销售额',templet:function (d) {
+                        return '<b style="color: red">¥'+d.pay_price+'</b>';
+                    }},
+            ]]
+            ,done:function(res){
+                var obtables = $('#LAY-index-cities').next('div');
+                paih(obtables);
+            }
+        });
+
+        //团长排行
+        table.render({
+            elem: '#LAY-index-captain'
+            ,url: config.url+'activity/captainList'//最新的十条订单
+            ,where :{
+                'id':id
+            }
+            // ,toolbar: '#toolbar'
+            // ,cellMinWidth: 80
+            ,defaultToolbar:false
+            ,page:true
+            ,cols: [[
+                {field:'username', title: '团长',templet: '#showimg'},
+                {field:'pay_price', title: '销售额',templet:function (d) {
+                        return '<b style="color: red">¥'+d.pay_price+'</b>';
+                    }},
+                {field:'profit_price', title: '利润',templet:function (d) {
+                        return '<b style="color: red">¥'+d.profit_price+'</b>';
+                    }},
+                {field:'fx_price', title: '佣金',templet:function (d) {
+                        return '<b style="color: red">¥'+d.fx_price+'</b>';
+                    }},
+
+            ]]
+            ,done:function(res){
+                var obtables = $('#LAY-index-captain').next('div');
+                paih(obtables);
+            }
+        });
+
+        //  商品排行
+        table.render({
+            elem: '#LAY-index-goods'
+            ,url: config.url+'activity/goodsList'//最新的十条订单
+            // ,toolbar: '#toolbar'
+            ,where :{
+                'id':id
+            }
+            ,cellMinWidth: 80
+            ,defaultToolbar:false
+            ,page:true
+            ,cols: [[
+                {field:'goods_name', title: '商品',templet: '#showimg'},
+                // {field:'city', title: '城市'},
+                {field:'goods_headimage', title: '封面图' , width: 100  ,templet:'<div><img width="50px" height="25px" src="{{ d.goods_headimage }}"></div>'},
+
+                {field:'pay_price', title: '总销售额',templet:function (d) {
+                        return '<b style="color: red">¥'+d.pay_price+'</b>';
+                    }},
+                {field:'goods_num', title: '销量'},
+            ]]
+            ,done:function(res){
+                var obtables = $('#LAY-index-goods').next('div');
+                paih(obtables , 6);
+            }
+        });
+
+        function paih(obj , row = 5) {
+            var i = 1;
+            var i2 = 6;
+            var i3 = 11;
+            if(row == 6){
+                i = 1;
+                i2 = 7;
+                i3 = 13;
+            }
+            obj.find($('td')).eq(i).children('div').css('color','#FFB800');
+            obj.find($('td')).eq(i2).children('div').css('color','#FF5722');
+            obj.find($('td')).eq(i3).children('div').css('color','#5FB878');
+        }
+        //区块轮播切换
+        layui.use(['admin', 'carousel'], function(){
+            var $ = layui.$
+                ,admin = layui.admin
+                ,carousel = layui.carousel
+                ,element = layui.element
+                ,device = layui.device();
+
+            //轮播切换
+            $('.layadmin-carousel').each(function(){
+                var othis = $(this);
+                carousel.render({
+                    elem: this
+                    ,width: '100%'
+                    ,arrow: 'none'
+                    ,interval: othis.data('interval')
+                    ,autoplay: othis.data('autoplay') === true
+                    ,trigger: (device.ios || device.android) ? 'click' : 'hover'
+                    ,anim: othis.data('anim')
+                });
+            });
+
+            element.render('progress');
+
+        });
+//   查看运营金额
+    layui.use(['carousel', 'echarts'], function(){
+        var $ = layui.$
+            ,carousel = layui.carousel
+            ,echarts = layui.echarts;
+
+        var echartsApp = [], options = [
+            {
+
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "¥{c}"
+                },
+                toolbox: {
+                    show : true,
+                    feature : {
+                        magicType : {
+                            show: true,
+                            type: ['pie', 'funnel']
+                        },
+                        restore : {show: true},
+                        // saveAsImage : {show: true}
+                    }
+                },
+                // calculable : true,
+                series : [
+                    {
+                        name:'运营金额',
+                        type:'pie',
+                        // radius : [30, 110],
+                        // center : ['75%', '50%'],
+                        roseType : 'area',
+                        data:[
+                            {value:100, name:'总收入(1000)'},
+                            {value:500, name:'总利润'},
+                            {value:150, name:'总成本'},
+                            {value:250, name:'总佣金'},
+                        ]
+                    }
+                ]
+            }
+        ]
+            ,elemDataView = $('#LAY-index-bin').children('div')
+            ,renderDataView = function(index){
+            admin.req({
+                type:'POST',
+                url: config.url+'activity/echat_list'
+                // ,where :{
+                //     'id':id
+                // }
+                ,data:{'id':id},
+                done:function(res) {
+                    console.log(res)
+                    // 数据多用循环
+                    if(res.data){
+                        options[0]['series'][0]['data'][0]['name'] = '总收入(¥' + res.data.sum_pay_price + ')';
+                        options[0]['series'][0]['data'][0]['value'] = res.data.sum_pay_price;
+
+                        options[0]['series'][0]['data'][1]['name'] = '总利润(¥' + res.data.sum_profit_price + ')';
+                        options[0]['series'][0]['data'][1]['value'] = res.data.sum_profit_price;
+
+                        options[0]['series'][0]['data'][2]['name'] = '总成本(¥' + res.data.sum_count_price + ')';
+                        options[0]['series'][0]['data'][2]['value'] = res.data.sum_count_price;
+
+                        options[0]['series'][0]['data'][3]['name'] = '总佣金(¥' + res.data.sum_fx_price + ')';
+                        options[0]['series'][0]['data'][3]['value'] = res.data.sum_fx_price;
+                    }else
+                        options[0]['series'][0]['data'] = [];
+                    //渲染
+                    echartsApp[index] = echarts.init(elemDataView[index], layui.echartsTheme);
+                    echartsApp[index].setOption(options[index]);
+                    window.onresize = echartsApp[index].resize;
+                }
+            });
+        };
+        //没找到DOM，终止执行
+        if(!elemDataView[0]) return;
+        renderDataView(0);
+
+        });
+    });
+</script>

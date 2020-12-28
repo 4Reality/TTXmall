@@ -1,0 +1,139 @@
+<button class="layui-btn layui-btn-normal layui-btn-sm" style="position: fixed;
+    z-index: 9999;
+        margin-left: 14px; margin-top: 2px;
+    background-color: #1e9fff9e;" onclick="javascript:history.back(-1);"><i class="layui-icon"></i>返回上一级</button>
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">添加滚动图</div>
+      <div class="layui-card-body" style="padding: 15px;">
+        <blockquote style="margin-left: 110px;margin-top: 2px; color: red;" class="layui-elem-quote">* 亲.注意注意!!!尺寸:710*280px</blockquote>
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="banner-from-add">
+        <div class="layui-form-item">
+          <label class="layui-form-label">缩略图</label>
+          <div class="layui-upload">
+            <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button>
+            <div class="layui-upload-list del-image"  id="test-upload-normal-img"><ul></ul></div>
+          </div>
+        </div>
+        <!--<div class="layui-form-item">
+          <label class="layui-form-label">跳转链接</label>
+          <div class="layui-input-block">
+            <select name="link" lay-filter="aihao">
+              <option value="0">团长页</option>
+              <option value="1">供应商</option>
+              <option value="2">隐私政策</option>
+            </select>
+          </div>
+        </div>-->
+        <div class="layui-form-item">
+          <label class="layui-form-label">跳转链接</label>
+          <div class="layui-input-block">
+            <input type="text" name="link" lay-verify="required" autocomplete="off" placeholder="请输入跳转链接" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="banner-from-add-submit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script>
+      layui.use(['admin','layer','upload', 'form'], function() {
+          var $ = layui.$
+              ,admin = layui.admin
+              , upload = layui.upload
+              ,layer = layui.layer
+              ,form = layui.form;
+          var layedit;
+          layui.use('layedit', function(){
+             layedit = layui.layedit;
+              var url=config.url+'base_admin/upload';
+              index = layedit.build('goods_content',{
+                  height:300,
+                  uploadImage:{url: url, type: 'post'}
+
+              }); //建立编辑器
+          });
+          layui.use('form', function() {
+              form.render();
+          });
+          /*
+          *  限购显示
+          * */
+          $('#limitation-show').hide();
+          form.on('checkbox(limitation)', function(data){
+              if(data.elem.checked){
+                $('#limitation-show').show();
+                $('#limitation-show input').attr('name','type[0][1]');
+              }
+              else{
+                  $('#limitation-show').hide();
+                  $('#limitation-show input').removeAttr('name');
+              }
+          });
+          /* 监听提交 */
+          form.on('submit(banner-from-add-submit)', function(data){
+              // data.field.goods_content = layedit.getContent(editIndex);
+              $.post(config.url+'app_banner/add',
+                  data.field,
+                  function(res){
+                     if(res.code == 0){
+                         layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                             window.location.href =config.html_url+'app_banner/index';
+                         });
+                     }else{
+                         layer.msg(res.data, {
+                             icon: 2
+                         })
+                     }
+              });
+              return false;
+          });
+          /* 自定义验证规则 */
+          form.verify({
+              content: function(value) {//验证富文本编辑器
+                  return layedit.sync(index);
+              },
+          });
+
+          $('.del-image').on('click','.layui-icon', function () {
+              $(this).parents('dd').remove();
+          });
+          //普通图片上传
+          var uploadInst = upload.render({
+              elem: '#test-upload-normal'
+              ,url: config.url+'base_admin/upload'
+              ,data:{"type":"picture"}
+              ,multiple: true
+              ,size: 1700 //限制文件大小，单位 KB
+              ,before: function(obj){
+                  layer.load(0, {
+                      offset: 'auto'
+                  });
+              }
+              ,done: function(res){
+                  //上传完毕
+                  if (res.code > 0) {
+                      return layer.msg('上传失败');
+                  }
+                  $('#test-upload-normal-img ul').empty();
+                  var str = '<dd><i class="layui-icon">&#x1007;</i> <img  width="100px" src="'+res.data.src+'"> <p id="test-upload-demoText1"></p><input type="hidden" name="banner_image" value="'+res.data.src+'" id="cover_value"></dd>';
+                  $('#test-upload-normal-img ul').append(str)
+                  layer.closeAll();
+              }
+              , error: function () {
+                  //演示失败状态，并实现重传
+                  var demoText = $('#test-upload-demoText1');
+                  demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                  demoText.find('.demo-reload').on('click', function () {
+                      uploadInst.upload();
+                  });
+              }
+          });
+      });
+  </script>
+

@@ -1,0 +1,157 @@
+
+<title>表单组合</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>模板消息配置</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">模板消息配置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab">
+
+                <div class="layui-tab-content">
+                    <!--消息通知-->
+                    <div class="layui-tab-item layui-show">
+                        <blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">
+                            <a href="https://www.kancloud.cn/ai41233214/tuangou_mubanxiaoxi/974941"  target="_blank" style="color: red">点击查看模板消息配置详情</a>
+                        </blockquote>
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="wechatconfig-form-pay">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">到货通知</label>
+                                <div class="layui-input-block">
+                                    <input type="text"  name="send[template_id]"  placeholder="发货通知模板ID" autocomplete="off" class="layui-input">
+                                    <input type="hidden"  name="send[type]" value="0"  placeholder="发货通知模板ID" autocomplete="off" class="layui-input">
+
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">支付通知</label>
+                                <div class="layui-input-block">
+                                    <input type="text"  name="pay[template_id]"  placeholder="支付通知模板ID" autocomplete="off" class="layui-input">
+                                    <input type="hidden"  name="pay[type]" value="1"  placeholder="支付通知模板ID" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">核销通知</label>
+                                <div class="layui-input-block">
+                                    <input type="text"  name="hx[template_id]"  placeholder="核销通知模板ID" autocomplete="off" class="layui-input">
+                                    <input type="hidden"  name="hx[type]" value="2"  placeholder="核销通知模板ID" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">提现通知</label>
+                                <div class="layui-input-block">
+                                    <input type="text"  name="reflect[template_id]"  placeholder="提现通知模板ID" autocomplete="off" class="layui-input">
+                                    <input type="hidden"  name="reflect[type]" value="3"  placeholder="提现通知模板ID" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">团长审核</label>
+                                <div class="layui-input-block">
+                                    <input type="text"  name="cap_p[template_id]"  placeholder="团长审核模板ID" autocomplete="off" class="layui-input">
+                                    <input type="hidden"  name="cap_p[type]" value="4"  placeholder="团长审核模板ID" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div id="pay_configs">
+
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button class="layui-btn" lay-submit lay-filter="captain-from-edit-submit">立即提交</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form'], function(){
+        //定义表单
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,form = layui.form;
+
+        //隐藏
+        $('#aliyun_oss').hide();
+        $('#qiniuyun').hide();
+        $('#tenxunyun').hide();
+
+
+        //富文本编辑器 初始化
+        var  layedit;
+        var  index;
+        var ci = $('#cright-content');
+        layui.use('layedit', function(){
+            layedit = layui.layedit;
+            var url=config.url+'base_admin/upload?type=picture';//图片上传路径
+            index=layedit.build('demo',{
+                height:600,
+                uploadImage:{url: url, type:'post'},
+            }); //建立编辑器
+        });
+
+
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'Config_Template/getSite',//数据接口
+            done:function(res) {
+                if (res.data) {
+                    console.log(res.data)
+                    // if(res.data.tmp_send != null){
+                        form.val("wechatconfig-form-pay", {
+                            "id": res.data.id,// "name": "value"
+                            'send[template_id]'   :res.data.tmp_send?res.data.tmp_send.template_id:'1',
+                            'pay[template_id]'    :res.data.tmp_pay?res.data.tmp_pay.template_id:'',
+                            'hx[template_id]'     :res.data.hx?res.data.hx.template_id:'',
+                            'reflect[template_id]':res.data.reflect?res.data.reflect.template_id:'',
+                            'cap_p[template_id]'  :res.data.cap_p?res.data.cap_p.template_id:'',
+
+                        });
+                    // }
+
+
+                }
+            }
+        });
+
+        form.on('submit(captain-from-edit-submit)', function(data){
+            $.post(config.url+'Config_Template/addnew',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.msg('添加成功! ≥ ▽ ≤', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }
+                });
+            return false;
+        });
+
+
+
+    });
+    /*上传cert_path*/
+
+</script>

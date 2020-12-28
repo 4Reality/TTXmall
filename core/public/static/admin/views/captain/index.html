@@ -1,0 +1,313 @@
+
+<title>团长管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>团长管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">团长管理</div>
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-bottom: 10px;">
+                        搜索：
+                        <div class="layui-inline">
+                            <input class="layui-input"     style="width: 210px"  name="search" placeholder="团长姓名/昵称/地址/电话/小区" id="demoReload" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+                        <button class="layui-btn" data-type="excel_order">
+                            导出
+                        </button>
+                    </div>
+                    <table class="layui-hide" id="captain-table-autowidth" lay-filter="captain-table-autowidth"></table>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" lay-event="addcaptain">
+                                <i class="layui-icon">&#xe654;</i>添加
+                            </button>
+                            <button class="layui-btn" data-type="2"  lay-event="refshare">
+                                <i class="layui-icon">&#xe9aa;</i>清除二维码缓存
+                            </button>
+                        </div>
+                    </script>
+                    <!--头部操作按钮-->
+                    <!--<script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" data-type="2"  lay-event="checkok">
+                                <i class="layui-icon">&#xe605;</i>通过选择的团长
+                            </button>
+                            <button class="layui-btn" data-type="1" lay-event="checksdie">
+                                <i class="layui-icon">&#xe673;</i>封杀选择的团长
+                            </button>
+                        </div>
+                    </script>-->
+                    <!-- 审核袁术 -->
+                    <script type="text/html" id="switchTpl">
+                        <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="通过|不通过" lay-filter="capStatus" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                    <!--行内操作按钮-->
+                    <!--<script type="text/html" id="test-table-autowidth-barDemo">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="del" title="删除">
+                            <i class="layui-icon">&#xe640;</i>
+                        </a>
+                    </script>-->
+                    <script type="text/html" id="showimg">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" data-type="{{ d.headimage }}" id="showuserinfo" lay-event="detail"><i class="layui-icon">&#xe66f;</i>{{ d.nickname }}</a>
+                    </script>
+                    <script type="text/html" id="checkboxTpl">
+                        <input type="checkbox" name="lock" value="{{d.id}}" title="锁定" lay-filter="lockDemo" {{ d.lock == 1 ? 'checked' : '' }}>
+                    </script>
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="detail"><i class="layui-icon">&#xe642;</i>编辑</a>
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640</i>删除</a>
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="price"><i class="layui-icon">&#xe642;</i>明细</a>
+                        <a class="layui-btn layui-bg-red layui-btn-xs"  lay-event="level"><i class="layui-icon">&#xe642;</i>升级团长</a>
+                        <a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="bind_level"><i class="layui-icon">&#xe642;</i>绑定下级</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin', 'table'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,form    = layui.form;
+
+        var tableIns = table.render({
+            elem: '#captain-table-autowidth'
+            ,url: config.url+'captain/index'//数据接口
+            ,toolbar: '#toolbar'
+            ,cellMinWidth: 80
+            ,defaultToolbar:[]
+            ,page:true
+            ,cols: [[
+                {field:'id', title: 'ID', width:50}
+                ,{field:'status', title: '审核'
+                    ,templet:  '#switchTpl', unresize: true
+                },
+                {field:'nickname', title: '用户信息' , align:'center', height:'43px', templet: '#showimg'},
+                {field:'address', title: '地址'},
+                {field:'city', title: '所属城市'},
+                {field:'level_level', title: '团长等级'  , width:110,templet: function(d){
+                        if(d.level_level==1){
+                            return '<a class="layui-btn  layui-bg-orange layui-btn-xs">'+d.level_content+'</a>';
+                        }else if(d.level_level==2){
+                            return '<a class="layui-btn  layui-bg-gray layui-btn-xs">'+d.level_content+'</a>';
+                        }else if(d.level_level==3){
+                            return '<a class="layui-btn  layui-bg-red layui-btn-xs">'+d.level_content+'</a>';
+                        }else if(d.level_level>3){
+                            return '<a class="layui-btn  layui-bg-white layui-btn-xs">'+d.level_content+'</a>';
+                        }else if(d.level_level==0){
+                            return '<a class="layui-btn  layui-bg-green layui-btn-xs"> 普通团长</a>';
+                        }
+                    }
+                },
+                {field:'homename', title: '小区'},
+                {field:'username', title: '团长姓名'},
+                {field:'mobile', title: '手机号'},
+                {field:'s_cap', title: '上级团长'},
+                {field:'new_balance', title: '团长佣金',templet:function (d) {
+                        return '<b style="color: red">¥'+d.new_balance+'</b>';
+                    }},
+                {field:'create_time', title: '申请时间'},
+                {field:'lock', title:'是否锁定', width:110, templet: '#checkboxTpl', unresize: true},
+                {fixed: 'right', title:'操作', toolbar: '#rights', width:400}
+            ]]
+            ,done:function(res){
+                hoverOpenImg();//显示大图
+            }
+        });
+
+        function hoverOpenImg(){
+            var img_show = null; // tips提示
+            $('td #showuserinfo').hover(function(){
+                var img = "<img class='img_msg' src='"+$(this).data('type')+"' style='width:130px;' />";
+                img_show = layer.tips(img, this,{
+                    tips:[2, 'rgba(41,41,41,.5)']
+                    ,area: ['160px']
+                });
+            },function(){
+                layer.close(img_show);
+            });
+        }
+
+        table.on('tool(captain-table-autowidth)', function(obj){
+            var data = obj.data; //得到所在行所有键值
+            if(obj.event === 'detail') {
+                layer.open({
+                    type: 2
+                    , title: '' //不显示标题栏
+                    , closeBtn: false
+                    , area: ['700px', '650px']
+                    , shade: 0.8
+                    , shadeClose: true
+                    , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    , btnAlign: 'c'
+                    , moveType: 1 //拖拽模式，0或者1
+                    , content: config.html_url + 'captain/detail/id=' + data.id
+                });
+            }else if(obj.event === 'level'){
+                layer.open({
+                    type: 2
+                    , title: '' //不显示标题栏
+                    , closeBtn: false
+                    , area: ['700px', '650px']
+                    , shade: 0.8
+                    , shadeClose: true
+                    , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    , btnAlign: 'c'
+                    , moveType: 1 //拖拽模式，0或者1
+                    , content: config.html_url + 'captain/cap_level/id=' + data.id
+                });
+            }else if(obj.event === 'bind_level'){
+                layer.open({
+                    type: 2
+                    , title: '' //不显示标题栏
+                    , closeBtn: false
+                    , area: ['900px', '650px']
+                    , shade: 0.8
+                    , shadeClose: true
+                    , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    , btnAlign: 'c'
+                    , moveType: 1 //拖拽模式，0或者1
+                    , content: config.html_url + 'captain/bind_level/id=' + data.id
+                });
+            }else if(obj.event === 'del'){
+                layer.confirm('您确定要删除该团长吗?', function(index){
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'captain/delCap'//数据接口
+                        , data: {
+                            "id"  : data.id,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                            }, function(){
+                                location.reload();
+                            });
+                        }
+                    });
+                });
+            }else if(obj.event === 'price'){
+                layer.open({
+                    type: 2
+                    , title: '' //不显示标题栏
+                    , closeBtn: false
+                    , area: ['900px', '650px']
+                    , shade: 0.8
+                    , shadeClose: true
+                    , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    , btnAlign: 'c'
+                    , moveType: 1 //拖拽模式，0或者1
+                    , content: config.html_url + 'captain/cap_price/id=' + data.id
+                });
+            }
+
+        });
+        form.on('switch(capStatus)', function(obj){
+            if(obj.elem.checked == 0){
+                layer.msg('审核通过的无法再次操作喔!', {
+                    offset: '15px'
+                    , icon: 2
+                    , time: 1000,
+                    end:function () {
+                        admin.events.refresh()
+                    }
+                });
+                return false;
+            }
+            admin.req({
+                type: 'POST',
+                url: config.url + 'captain/edit'//数据接口
+                , data: {
+                    "id": obj.value,
+                    "status": (obj.elem.checked) ? 1 : 0,
+                    // "type": 3,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+        //监听锁定操作
+        form.on('checkbox(lockDemo)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'captain/edit'//数据接口
+                , data: {
+                    "id": obj.value,
+                    "lock": (obj.elem.checked) ? 1 : 0,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        search: demoReload.val()
+                    }
+                });
+            },
+            excel_order:function () {
+                var data = [];
+                data.demoReload      = $('#demoReload').val();
+                var url  = config.url+'Excel/excel_cap?a=1&demoReload='+data.demoReload;
+                window.location=url;
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('toolbar(captain-table-autowidth)', function(obj){
+            if(obj.event == 'addcaptain'){
+                window.location.href = config.html_url+'captain/add';
+            }else if(obj.event == 'refshare'){
+                admin.req({
+                    type:'POST',
+                    url: config.url+'captain/refshare', //数据接口
+                    done:function(res){
+                        layer.msg('清除成功! O(∩_∩)O~', {
+                            offset: '15px'
+                            ,icon: 1
+                            ,time: 1000
+                        });
+                    }
+                });
+            }
+        });
+
+    });
+</script>

@@ -1,0 +1,101 @@
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">编辑分销</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-edit">
+        <div class="layui-form-item">
+          <label class="layui-form-label">等级名字</label>
+          <div class="layui-input-inline">
+            <input type="text" name="content" lay-verify="required" autocomplete="off"  class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">分销比例</label>
+          <div class="layui-input-inline">
+            <input type="text" name="balance" lay-verify="required|number" autocomplete="off"  class="layui-input">
+          </div>
+          <span style="    font-size: 20px;
+    font-weight: 400;
+    line-height: 38px;
+    text-align: right;">%</span>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-edit-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['admin','layer','upload', 'form' , 'layedit' , 'formSelects'], function() {
+    var $ = layui.$
+            ,admin = layui.admin
+            , upload = layui.upload
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,formSelects = layui.formSelects
+            ,form = layui.form;
+
+    var router = layui.router();
+    var id = router.search.id;
+    if(typeof(id)=='undefined'){
+      id=0;//默认新增
+    }
+
+    form.verify({
+      lengthnow: function(value){
+        if(value.length > 20){
+          return '商品至多只能是20字呀! ≥...≤!~';
+        }
+      }
+    });
+    index = layedit.build('goods_content',{
+      height:300,
+      uploadImage:{url: config.url+'base_admin/upload', type: 'post'}
+
+    }); //建立编辑器
+    //发送请求获取数据(数据的回显)
+    admin.req({
+      type:'POST',
+      url: config.url+'captain/editFx'//数据接口
+      ,data:{"id":id},
+      done:function(res){
+        console.log(res)
+        if(res.data){
+          //预设元素
+          form.val("goods-cat-form-edit", {
+            "balance": res.data.balance,
+            "content": res.data.content,
+          });
+        }
+        formSelects.render();
+      }
+    });
+    layui.use('form', function() {
+      form.render();
+    });
+    $('.del-image').on('click','.layui-icon', function () {
+      $(this).parents('dd').remove();
+    });
+    /* 监听提交 */
+    form.on('submit(goods-cat-form-edit-submit)', function(data){
+      data.field.id = id;
+      $.post(config.url+'captain/editFx',
+              data.field,
+              function(res){
+                if(res.code == 0){
+                  layer.alert('修改成功! ≥ ▽ ≤', function(index){
+                      window.parent.layer.closeAll();
+                      window.parent.location.reload()
+                  });
+                }else{
+                  layer.alert(res.data);
+                }
+              });
+      return false;
+    });
+  });
+</script>
+

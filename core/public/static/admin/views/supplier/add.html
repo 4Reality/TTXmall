@@ -1,0 +1,120 @@
+<button class="layui-btn layui-btn-normal layui-btn-sm" style="position: fixed;
+    z-index: 9999;
+        margin-left: 14px; margin-top: 2px;
+    background-color: #1e9fff9e;" onclick="javascript:history.back(-1);"><i class="layui-icon"></i>返回上一级</button>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">添加供应商</div>
+        <div class="layui-card-body" style="padding: 15px;">
+
+            <form class="layui-form" action="" lay-filter="captain-from-edit">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供应商姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="username" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">地址</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="address" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">手机号</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="mobile" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所属城市</label>
+                    <div class="layui-input-block">
+                        <select name="cityid" xm-select="cityid"  xm-select-radio  lay-verify="required" xm-select-search="">
+                            <option value="0" disabled="disabled"></option>
+                        </select>
+                        <blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">* 亲.注意注意!!!城市一但确认了将无法修改~~!!!</blockquote>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所属用户</label>
+                    <div class="layui-input-block">
+                        <input type="text"  required id="searchUid"  lay-verify="required" placeholder="选择用户" autocomplete="off" class="layui-input">
+                        <input type="hidden" name="uid" id="obsearchUid" >
+                        <blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">* 亲.注意注意!!!用户一但确认了将无法修改~~!!!</blockquote>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="captain-from-edit-submit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin','layer', 'form' , 'layedit' , 'formSelects'], function() {
+        var $ = layui.$
+            ,admin = layui.admin
+            ,layer = layui.layer
+            ,formSelects = layui.formSelects
+            ,form = layui.form;
+        layui.use('form', function() {
+            form.render();
+        });
+        formSelects.data('cityid', 'server', {
+            url: config.url+'cities/selectlistAll',
+            keyword: '',
+        });
+
+        $("#searchUid").focus(function(event){
+            layer.open({
+                type: 2
+                ,closeBtn: false
+                ,area:  ['800px', '100%']
+                ,shade: 0.8
+                ,shadeClose : true
+                ,id: 'LAY_capuser'
+                ,btnAlign: 'c'
+                ,moveType: 0
+                ,content: config.html_url+'captain/selectuser',
+                btn: ['确定','关闭']
+            });
+        });
+        /* 监听提交 */
+        form.on('submit(captain-from-edit-submit)', function(data){
+            if($("#obsearchUid").val() == ''){
+                layer.msg('未选择任何用户!', {
+                    offset: '15px'
+                    , icon: 2
+                    , time: 2000
+                });
+                return false;
+            }
+            $.post(config.url+'supplier/add',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.msg('添加成功! ≥ ▽ ≤', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                            ,end:function () {
+                                window.location.href = config.html_url+'supplier/index';
+                            }
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }
+                });
+            return false;
+        });
+
+    });
+</script>

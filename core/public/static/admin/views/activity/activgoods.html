@@ -1,0 +1,266 @@
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="layui-tab layui-tab-brief" lay-filter="activity-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">已添加的商品</li>
+                            <li  id="notready">未添加的商品</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <table class="layui-hide" id="avtivty-table" lay-filter="avtivty-table"></table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-hide" id="avtivty-add-table" lay-filter="avtivty-add-table"></table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已选择的商品 -->
+                    <!--<script type="text/html" id="rights">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs"   lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+                    </script>-->
+
+                    <script id="city_text" type="text/html">
+                        <div>
+                            {{# layui.each(d.city_text, function(index, item){ }}
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" >{{ item }}</a>
+                            {{# }); }}
+                        </div>
+                    </script>
+                    <!--over-->
+
+                    <!-- 未选择的商品 -->
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container" >
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" id="chetoolbar1" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加所选
+                            </button>
+                            <button class="layui-btn layui-bg-blue layui-btn-sm" id="chetoolbar2" data-type="2"  lay-event="addAll">
+                                <i class="layui-icon">&#xe654;</i>一键添加所有
+                            </button>
+                            <button class="layui-btn  layui-btn-sm"  data-type="2"  lay-event="addGoods">
+                                <i class="layui-icon">&#xe654;</i>新增商品
+                            </button>
+                        </div>
+                    </script>
+                    <!-- over -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    layui.use(['admin', 'table'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,form = layui.form;
+
+        var router = layui.router();
+        var id = router.search.id;
+        var end_time = router.search.end_time;
+        var dis = 0;
+        if(end_time < new Date().getTime()/1000){
+            $('#notready').empty();
+            dis = 1;
+        }
+        //  --------------------------------------------------------------------
+        // 已选择的活动商品
+        table.render({
+            elem: '#avtivty-table'
+            ,where:{
+                'id':id
+            }
+            ,url: config.url+'activity/activgoods'//数据接口
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                {field: 'id', title: 'ID', width: 80, sort: true}
+                ,{field: 'goods_name', title: '商品名称', width: 120}
+                ,{field:'init_price', title: '原价', width:80}
+                ,{field:'price', title: '活动价', width:80}
+                ,{field:'stock', title: '库存', width:80}
+                ,{field:'city', title: '城市',templet:'#city_text', align:'center'}
+                ,{fixed: 'right', title:'删除', templet:function (d) {
+                        if(dis == 1)
+                            return '<a class="layui-btn layui-btn-disabled layui-btn-xs" ><i class="layui-icon">&#xe640;</i>删除</a>';
+                        else
+                            return '<a class="layui-btn layui-btn-primary layui-btn-xs"   lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>';
+                    }}
+            ]]
+        });
+        table.on('tool(avtivty-table)', function(obj){
+
+            var data = obj.data;
+            data.atvid = id;
+            if(obj.event === 'del'){
+                layer.confirm('您确定要移出商品吗?', function(index){
+                layer.close(index);
+                $.post(config.url+'activity/delatvgoods',
+                    data,
+                    function(res){
+                        if(res == true){
+                            layer.msg('删除成功! ≥...≤!!!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                                ,end:function () {
+                                    admin.events.refresh()
+                                }
+                                });
+                            obj.del();
+                        }else{
+                            layer.alert('删除失败啦! ≥...≤!!!');
+                        }
+                    });
+                });
+            }
+        });
+        //  ------------------------- 已选的商品 OVER  -------------------------------------------
+        //  ----------------------------- 未选择的商品 ---------------------------------------
+        // 已选择的活动商品
+        table.render({
+            elem: '#avtivty-add-table'
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,where:{
+             'id':id
+            }
+            ,url: config.url+'activity/notReadyGoods'//数据接口
+            ,cellMinWidth: 80
+            ,page: true
+            ,cols: [[
+                {checkbox:true},
+                {field: 'id', title: 'ID', width: 80, sort: true}
+                ,{field: 'goods_name', title: '商品名称', width: 120}
+                ,{field:'init_price', title: '原价', width:80}
+                ,{field:'price', title: '活动价', width:80}
+                ,{field:'stock', title: '库存', width:80}
+                ,{field:'city', title: '城市',templet:'#city_text', align:'center'}
+            ]]
+            ,done:function(res){
+                // 无数据就不要添加
+                if(res.data == ''){
+                    $('#chetoolbar1').removeClass('layui-btn-primary');
+                    $('#chetoolbar1').addClass('layui-btn-disabled');
+                    $('#chetoolbar2').removeClass('layui-bg-blue');
+                    $('#chetoolbar2').addClass('layui-btn-disabled');
+                    $('#chetoolbar1').removeAttr('lay-event');
+                    $('#chetoolbar2').removeAttr('lay-event');
+                }
+
+            }
+        });
+        //监听工具条
+        table.on('toolbar(avtivty-add-table)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            if(obj.event == 'addcheckok'){
+                var obdata = checkStatus.data;
+                if(obdata == ''){
+                    layer.msg('未选择任何商品!', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 1000
+                    });
+                    return false;
+                }
+                // return false;
+                //掉删除接口
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/addGoods'//数据接口
+                    ,
+                    data: {
+                        'data' : obdata,
+                        'atvid' : id,
+                        'type' : 1
+                    },
+                    beforeSend: function () {
+                        layer.load(0, {
+                            offset: 'auto'
+                        });
+                    },
+                    done: function (res) {
+                        if(res.data == 200){
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            })
+                        }else{
+                            layer.msg(res.data, {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            });
+                        }
+
+                    }
+                });
+            }else if(obj.event == 'addAll'){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/addGoods'//数据接口
+                    , data: {
+                        'atvid' : id,
+                        'type' : 2
+                    },
+                    beforeSend: function () {
+                        layer.load(0, {
+                            offset: 'auto'
+                        });
+                    },
+                    done: function (res) {
+                        if(res.data == 200){
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            })
+                        }else{
+                            layer.msg(res.data, {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            });
+                        }
+
+                    }
+                });
+            }else if(obj.event == 'addGoods'){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/tiao'
+                    , data: {
+                        'atvid' : id,
+                    }
+                    ,done: function (res) {
+                        window.parent.layer.closeAll();
+                        window.parent.location.reload();
+                    }
+                });
+            }
+            return false;
+        });
+        //  -------------------------  未选的商品 OVER  -------------------------------------------
+
+    });
+</script>

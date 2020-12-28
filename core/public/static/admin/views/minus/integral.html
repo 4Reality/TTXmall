@@ -1,0 +1,103 @@
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>积分商城</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">积分商城</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab">
+                <div class="layui-tab-content">
+                    <!--满减设置内容-->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">状态</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">积分</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="integral" lay-verify="required|number" class="layui-input" id="end_time" placeholder="请输入满减金额">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">元</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="money" class="layui-input" id="delivery_time" placeholder="请输入优惠金额">
+                                </div>
+                                <blockquote style="margin-left: 110px" class="layui-elem-quote">多少积分可以抵扣多少元</blockquote>
+                            </div>
+                            <div class="layui-form-item" pane>
+                                <label class="layui-form-label">积分说明</label>
+                                <div class="layui-input-block">
+                                <textarea type="text" name="content" lay-verify=""  class="layui-textarea">
+                                </textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="minus-form-sbmiy">立即提交</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form' , 'laydate'], function(){
+        //定义表单
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,laydate = layui.laydate
+            ,form    = layui.form;
+        form.render();
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'minus/integral',//数据接口
+            done:function(res){
+                if(res.data){
+                    //预设元素
+                    form.val("component-form-group-xcx", {
+                        "status"  : (res.data.status) ? 1 : 0,
+                        "money"   : res.data.money,
+                        "integral": res.data.integral,
+                        "content" : res.data.content==0?'':res.data.content,
+                    });
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(minus-form-sbmiy)', function(data){
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'minus/addIntegral', //数据接口
+                data:data.field,
+                done:function(res){
+                    layer.msg('操作成功! ≥...≤!!!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+    });
+</script>

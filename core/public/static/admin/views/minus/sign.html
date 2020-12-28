@@ -1,0 +1,180 @@
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>签到设置</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">签到设置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab layui-tab-brief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">签到设置</li>
+                    <li>签到任务</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <!--满减设置内容-->
+                    <div class="layui-tab-item layui-show">
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">赠送积分</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="send" class="layui-input">
+                                </div>
+                                <blockquote style="margin-left: 110px" class="layui-elem-quote">单次签到赠送多少积分</blockquote>
+                            </div>
+                            <div class="layui-form-item" pane>
+                                <label class="layui-form-label">签到说明</label>
+                                <div class="layui-input-block">
+                                <textarea type="text" name="text" lay-verify=""  class="layui-textarea">
+                                </textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="minus-form-sbmiy">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"> </table>
+                            <script type="text/html" id="toolbar">
+                                <div class="layui-btn-container">
+                                    <button class="layui-btn" data-type="1"  lay-event="addcheckok">
+                                        <i class="layui-icon">&#xe654;</i>添加任务
+                                    </button>
+                                </div>
+                            </script>
+                            <script type="text/html" id="switchTpl">
+                                <input type="checkbox" name="status" value="{{d.id}}"  lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
+                            </script>
+                            <script type="text/html" id="rights">
+                                <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                                <a class="layui-btn layui-bg-red layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-edit"></i>删除</a>
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    layui.use(['layer', 'form','table', 'laydate'], function(){
+        //定义表单
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,laydate = layui.laydate
+            ,form    = layui.form;
+        var table    = layui.table;
+
+        form.render();
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'minus/sginSite',//数据接口
+            done:function(res){
+                if(res.data){
+                    //预设元素
+                    form.val("component-form-group-xcx", {
+                        "send"    : res.data.send,
+                        "text" : res.data.text==0?'':res.data.text,
+                    });
+                }
+            }
+        });
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'minus/sginList'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                {field:'full', title: '累计签到',templet:function (d) {
+                        return '<b style="color: red">'+d.day+'天</b>';
+                    }},
+                {field:'discount', title: '赠送积分',templet:function (d) {
+                        return '<b style="color: red">'+d.send+'个</b>';
+                    }},
+                {fixed: 'right', title:'操作', toolbar: '#rights',align: 'center'}
+            ]]
+        });
+        form.on('switch(status)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'minus/editMjStatus'//数据接口
+                , data: {
+                    "id": obj.value,
+                },
+                done: function (res) {
+                    if(res.data == 200){
+                        layer.msg('操作成功!', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        });
+                    }
+                }
+            });
+        });
+        form.render();
+
+        table.on('toolbar(test-table-autowidth)', function(obj) {
+            if(obj.event == 'addcheckok'){
+                window.location.href = config.html_url+'minus/sign_add';
+            }
+        });
+        table.on('tool(test-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                window.location.href =config.html_url+'minus/sign_edit/id='+data.id;
+            }else if(obj.event === 'del'){
+
+                layer.confirm('您确定要删除选择?', function(index){
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'minus/sginDel'//数据接口
+                        , data: {
+                            "id": data.id,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                            });
+                            location.reload();
+                        }
+                    });
+                });
+
+            }
+        });
+
+        //监听提交
+        form.on('submit(minus-form-sbmiy)', function(data){
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'minus/sginSite', //数据接口
+                data:data.field,
+                done:function(res){
+                    layer.msg('操作成功! ≥...≤!!!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+    });
+</script>

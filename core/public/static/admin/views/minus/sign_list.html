@@ -1,0 +1,134 @@
+<style>
+    .layui-form-label{
+        padding: 9px 8px;
+        width: inherit;
+    }
+</style>
+<title>签到任务</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>签到任务</cite></a>
+    </div>
+
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header layui-form layuiadmin-card-header-auto" lay-filter="order-from-search">
+                    <div class="layui-form-item">
+
+
+                    </div>
+                    <input type="hidden" id="search" name="search">
+                </div>
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"> </table>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加任务
+                            </button>
+                        </div>
+                    </script>
+                    <script type="text/html" id="switchTpl">
+                        <input type="checkbox" name="status" value="{{d.id}}"  lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                         <a class="layui-btn layui-bg-red layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-edit"></i>删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table' , 'laydate' , 'util'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,form = layui.form
+            ,util = layui.util;
+
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'minus/sginList'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                {field:'full', title: '累计签到',templet:function (d) {
+                        return '<b style="color: red">'+d.day+'天</b>';
+                    }},
+                {field:'discount', title: '赠送积分',templet:function (d) {
+                        return '<b style="color: red">'+d.send+'个</b>';
+                    }},
+                {fixed: 'right', title:'操作', toolbar: '#rights',align: 'center'}
+            ]]
+        });
+        form.on('switch(status)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'minus/editMjStatus'//数据接口
+                , data: {
+                    "id": obj.value,
+                },
+                done: function (res) {
+                    if(res.data == 200){
+                        layer.msg('操作成功!', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        });
+                    }
+                }
+            });
+        });
+        form.render();
+
+        //初始化json
+
+        //监听工具条
+        table.on('toolbar(test-table-autowidth)', function(obj) {
+            if(obj.event == 'addcheckok'){
+                window.location.href = config.html_url+'minus/sign_add';
+            }
+        });
+        table.on('tool(test-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                window.location.href =config.html_url+'minus/sign_edit/id='+data.id;
+            }else if(obj.event === 'del'){
+
+                layer.confirm('您确定要删除选择?', function(index){
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'minus/sginDel'//数据接口
+                        , data: {
+                            "id": data.id,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                            });
+                            location.reload();
+                        }
+                    });
+                });
+
+            }
+        });
+    });
+</script>

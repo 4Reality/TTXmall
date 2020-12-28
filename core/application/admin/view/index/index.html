@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>后台管理系统</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{$Think.const.NEW_APP_STATIC_PATH}layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="{$Think.const.NEW_APP_STATIC_PATH}layui/css/main.css" media="all">
+  <link rel="stylesheet" href="{$Think.const.NEW_APP_STATIC_PATH}layui/css/formSelects-v4.css" />
+  <style type="text/css">
+    .hide{display:none}
+  </style>
+
+
+  <script>
+  /^http(s*):\/\//.test(location.href) || alert('请先部署到 localhost 下再访问');
+
+/*    var config = {
+      v : 1.0,
+        url: '{:cookie("init_url")}&s=/admin/',
+        html_url:'{:cookie("init_url")}#/',
+        js_path:'/addons/longbing_shequpintuan/core/public/static/admin/controller/'
+    }*/
+
+  if("{$is_weiqin_version}"==1){
+    var config = {
+      v : 1.0,
+      /*接口请求地址*/
+      url: '{:cookie("init_url")}&s=/admin/',
+      html_url:'{:cookie("init_url")}#/',
+      js_path:'/addons/longbing_shequpintuan/core/public/static/admin/controller/',
+      css_path:'/addons/longbing_shequpintuan/core/public/static/admin/style/',
+      json_path:'/addons/longbing_shequpintuan/core/public/static/json/',
+      min_js:"{$min_js}",
+    };
+  }else{
+    //独立版的
+    var config = {
+      v : 1.0,
+      url:'/admin/',
+      html_url:'/admin.php#/',
+      js_path:'/static/admin/controller/',
+      css_path:'/static/admin/style/',
+      json_path:'/static/json/',
+      min_js:"{$min_js}",
+    }
+  }
+  if("{$m_city}"==1){
+    var config = {
+      v : 1.0,
+      url:'{:cookie("init_url")}/',
+      html_url:'{:cookie("init_url")}#/',
+      js_path:'/addons/longbing_shequpintuan/core/public/static/admin/controller/',
+      css_path:'/addons/longbing_shequpintuan/core/public/static/admin/style/',
+      json_path:'/addons/longbing_shequpintuan/core/public/static/json/',
+      min_js:"{$min_js}",
+    }
+  }
+  console.log(config.url)
+  console.log('{:cookie("init_url")}')
+
+  </script>
+</head>
+
+<body>
+  <div id="LAY_app"></div>
+  <script src="{$Think.const.NEW_APP_STATIC_PATH}layui/layui.js"></script>
+  <script>
+  layui.config({
+    base: '{$Think.const.NEW_APP_STATIC_PATH}admin/' //指定 layuiAdmin 项目路径，本地开发用 src，线上用 dist
+    ,version: new Date().getTime()
+  }).use('index');
+  // 设置全局变量
+  var init_url = '{:cookie("init_url")}';
+  </script>
+</body>
+
+
+</html>
+
+

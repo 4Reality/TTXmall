@@ -1,0 +1,160 @@
+<button class="layui-btn layui-btn-normal layui-btn-sm" style="position: fixed;
+    z-index: 9999;
+        margin-left: 14px; margin-top: 2px;
+    background-color: #1e9fff9e;" onclick="javascript:history.back(-1);"><i class="layui-icon"></i>返回上一级</button>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>优惠券设置</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">优惠券设置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab">
+                <div class="layui-tab-content">
+                    <!--满减设置内容-->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+                            <!--<div class="layui-form-item">-->
+                                <!--<label class="layui-form-label">状态</label>-->
+                                <!--<div class="layui-input-block">-->
+                                    <!--<input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭">-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">小程序名</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="name" lay-verify="required" class="layui-input" id="coupon_name" placeholder="小程序名">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">链接</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="link" lay-verify="required" class="layui-input" id="full_money" placeholder="小程序的链接">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">小程序图</label>
+                                <div class="layui-upload">
+                                    <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button>
+                                    <div class="layui-upload-list del-image"  id="test-upload-normal-img"><ul></ul></div>
+                                    <!--<blockquote style="margin-left: 110px" class="layui-elem-quote">商品封面图尺寸200*200px 最多只能上传1.2M之内的图片</blockquote>-->
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="minus-form-sbmiy">立即提交</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form','upload' , 'laydate'], function(){
+        //定义表单
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            , upload = layui.upload
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,form = layui.form;
+        laydate.render({
+            elem: '#expiration_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+        });
+
+        //常规用法
+        laydate.render({
+            elem: '#expiration_times'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+        });
+        form.render();
+        //查询配置
+
+        admin.req({
+            type:'POST',
+            url: config.url+'web_config/getWxapp',//数据接口
+            done:function(res){
+                if(res.data){
+                    //预设元素
+                    form.val("component-form-group-xcx", {
+                        "name": res.data.name,
+                        "link": res.data.link,
+                        // "expiration_time"  :  layui.laytpl.toDateString(res.data.expiration_time *1000),
+                    });
+                    if(res.data.img != ''){
+                        var str = '<dd><i class="layui-icon" >&#x1007;</i> <img  width="100px" src="'+res.data.img+'"> <p id="test-upload-demoText"></p><input type="hidden" name="img" value="'+res.data.img+'"></dd>';
+                        $('#test-upload-normal-img ul').append(str);
+                    }
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(minus-form-sbmiy)', function(data){
+            //发送请求
+            console.log(data);
+            admin.req({
+                type:'POST',
+                url: config.url+'web_config/postWxapp', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data==200){
+                        layer.alert('操作成功! ≥ ▽ ≤', function(index){
+                            window.parent.location.reload()
+                        });
+                    }
+                }
+            });
+        });
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test-upload-normal'
+            ,url: config.url+'base_admin/upload'
+            ,data:{"type":"picture"}
+            ,size: 1700 //限制文件大小，单位 KB
+            ,multiple: true
+            ,before: function(obj){
+                layer.load(0, {
+                    offset: 'auto'
+                });
+            }
+            ,done: function(res){
+                console.log(res)
+                //上传完毕
+                if (res.code > 0) {
+                    return layer.msg('上传失败');
+                }
+                $('#test-upload-normal-img ul').empty();
+                var str = '<dd><i class="layui-icon">&#x1007;</i> <img  width="100px" src="'+res.data.src+'"> <p id="test-upload-demoText1"></p><input type="hidden" name="img" lay-verify="required" value="'+res.data.src+'" id="cover_value"></dd>';
+                $('#test-upload-normal-img ul').append(str)
+                layer.closeAll();
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#test-upload-demoText1');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+        });
+
+    });
+</script>

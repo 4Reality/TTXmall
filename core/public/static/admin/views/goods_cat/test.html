@@ -1,0 +1,175 @@
+
+<title>分类管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>分类管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">分类管理</div>
+                <div class="layui-card-body">
+                    <div class="div-search-body">
+                        <button class="layui-btn" id="add_cate">
+                            <i class="layui-icon">&#xe608;</i> 添加商品分类
+                        </button>
+                        <button class="layui-btn layui-btn-primary up-all">全部收起</button>
+                        <button class="layui-btn layui-btn-primary down-all">全部展开</button>
+                    </div>
+                    <div class="test-tree-table"  lay-filter="test-table-autowidth-cat"></div>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加
+                            </button>
+                            <!--<button class="layui-btn" data-type="2"  lay-event="checkok">
+                                <i class="layui-icon">&#xe640;</i>删除
+                            </button>-->
+                        </div>
+                    </script>
+                    <script type="text/html" id="switchTpl">
+                        <input style="width: 200px" type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                    <!--图片-->
+
+                    <script type="text/html" id="rights">
+
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="edit">
+                            <i class="layui-icon layui-icon-edit"></i>
+                            编辑
+                        </a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var $;
+    layui.use(['admin', 'table','treetable'], function(){
+        var table      = layui.table;
+            $          = layui.$
+            ,layer     = layui.layer
+            ,treetable = layui.treetable;
+        $.ajax({
+            url:config.url+'goods_cat/getCatList',
+            method:'get',
+            dataType:'JSON',
+            success:function(res){
+                treetable.render({
+                    elem: '.test-tree-table',
+                    data: res.data,
+                    field: 'content',
+                    cols: [
+                        // {field:'id', title: 'ID', width: 50},
+                        {field:'content', title: '分类名称', width: 250},
+                        {field:'p_text', title: '上级分类',width: 200},
+                        {field:'sort', title: '分类排序',width: 200},
+                        {field:'text', title: '状态',width: 200},
+                        {
+                            field: 'actions',
+                            title: '操作',
+                            width: '30%',
+                            data: [
+                                '<button type="button" class="layui-btn layui-bg-cyan layui-btn-xs"\n' +
+                                '        onclick="editThisItem(this)">\n' +
+                                '    编辑\n' +
+                                '</button>',
+                                '<button type="button" class="layui-btn layui-btn-xs layui-btn-danger btn-delete-job btn-margin-m"\n' +
+                                '        onclick="deleteItem(this)">\n' +
+                                '    删除\n' +
+                                '</button>',
+                            ],
+                        }
+                    ]
+                });
+            }
+        })
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        search: demoReload.val()
+                    }
+                });
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        $('#add_cate').on('click', function(){
+            layer.open({
+                type: 2
+                ,title: '添加' //不显示标题栏
+                ,closeBtn: false
+                ,area:  ['700px', '600px']
+                ,shade: 0.8
+                ,shadeClose : true
+                ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                ,btnAlign: 'c'
+                ,moveType: 1 //拖拽模式，0或者1
+                ,content: config.html_url+'goods_cat/add_two'
+            });
+        });
+        $('.up-all').click(function(){
+            treetable.all('up');
+        })
+        $('.down-all').click(function(){
+            treetable.all('down');
+        })
+
+
+
+    });
+</script>
+<script>
+    function editThisItem (obj) {
+        var obj = $(obj);
+        var par = obj.parent().parent().parent();
+        var id = par[0].dataset.tbId;
+        console.log(id)
+        layer.open({
+            type: 2
+            ,title: '添加' //不显示标题栏
+            ,closeBtn: false
+            ,area:  ['700px', '600px']
+            ,shade: 0.8
+            ,shadeClose : true
+            ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+            ,btnAlign: 'c'
+            ,moveType: 1 //拖拽模式，0或者1
+            ,content: config.html_url+'goods_cat/edit_two/id='+id
+        });
+    }
+    function deleteItem (obj) {
+        var obj = $(obj);
+        var par = obj.parent().parent().parent();
+        var id = par[0].dataset.tbId;
+        layer.open({
+            content: '是否删除该分类和下级所有分类吗?',
+            yes: function (index, layero) {
+                $.ajax({
+                    url:config.url+'goods_cat/deleteCat',
+                    data:{id:id},
+                    method:'get',
+                    dataType:'JSON',
+                    success:function(res){
+                        window.parent.location.reload()
+                    }
+                })
+            }
+        });
+    }
+
+</script>

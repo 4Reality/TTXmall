@@ -1,0 +1,271 @@
+
+<title>供应商管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>供应商管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">供应商管理</div>
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-bottom: 10px;">
+                        搜索：
+                        <div class="layui-inline">
+                            <input class="layui-input" placeholder="姓名/电话/地址/用户名" name="search" id="demoReload" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+                    </div>
+                    <div class="layui-form layui-form-pane is_city_id" lay-filter="supplier-form-group-xcx" >
+                        <div class="layui-form-item" pane="">
+                            <label class="layui-form-label" style="width: 200px;">供应商申请菜单开关</label>
+                            <div class="layui-input-block" style="margin-left:200px;">
+                                <input type="checkbox" name="is_supplier"  lay-skin="switch" lay-text="开启|隐藏" lay-filter="is_supplier" >
+                            </div>
+                        </div>
+                    </div>
+                    <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"></table>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" data-type="2"  lay-event="checkok">
+                                <i class="layui-icon">&#xe605;</i>通过选择的供应商
+                            </button>
+                            <button class="layui-btn" lay-event="addsupplier">
+                                <i class="layui-icon">&#xe654;</i>添加
+                            </button>
+                        </div>
+                    </script>
+                    <!-- 审核袁术 -->
+                    <script type="text/html" id="switchTpl">
+                        <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="通过|不通过" lay-filter="capStatus" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                    <!--行内操作按钮-->
+                    <!--<script type="text/html" id="test-table-autowidth-barDemo">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="del" title="删除">
+                            <i class="layui-icon">&#xe640;</i>
+                        </a>
+                    </script>-->
+                    <script type="text/html" id="showimg">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" data-type="{{ d.headimage }}" id="showuserinfo" lay-event="detail"><i class="layui-icon">&#xe66f;</i>{{ d.nickname }}</a>
+                        <!--<div>
+
+                          <button class="layui-btn layui-btn-primary layui-btn-radius" lay-submit lay-filter="showuserinfo"   title="点击查看用户信息"> <i class="layui-icon">&#xe66f;</i>{{ d.nickname }}</button>
+                        </div>-->
+                    </script>
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="edite"><i class="layui-icon">&#xe642;</i>编辑</a>
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe642;</i>删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,form    = layui.form;
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'supplier/index'//数据接口
+            ,toolbar: '#toolbar'
+            ,cellMinWidth: 80
+            ,defaultToolbar:[]
+            ,page:true
+            ,cols: [[
+                {checkbox: true},
+                {field:'id', title: 'ID', width:50}
+                ,{field:'status', title: '审核', align:'center'
+                    ,templet: '#switchTpl', unresize: true
+                },
+                {field:'nickname', title: '用户信息' , align:'center', height:'43px', templet: '#showimg'},
+                {field:'address', title: '地址' , width:300},
+                {field:'username', title: '供应商姓名', width:150},
+                {field:'mobile', title: '手机号'},
+                {fixed: 'right', title:'操作', toolbar: '#rights', width:300}
+
+            ]]
+            ,done:function(res){
+                console.log(res)
+                hoverOpenImg();//显示大图
+                if(res.msg!=''){
+                    console.log('aaaa')
+                    $('.is_city_id').hide();
+                }
+            }
+        });
+        //  开关
+        admin.req({
+            type:'POST',
+            url: config.url+'supplier/supplier_status',//数据接口
+            done:function(res){
+                if(res.data){
+                    //预设元素
+                    form.val("supplier-form-group-xcx", {
+                        "is_supplier": (res.data.is_supplier == 1) ? 1 : 0,
+                    });
+                }
+                form.render();
+            }
+        });
+        function hoverOpenImg(){
+            var img_show = null; // tips提示
+            $('td #showuserinfo').hover(function(){
+                var img = "<img class='img_msg' src='"+$(this).data('type')+"' style='width:130px;' />";
+                img_show = layer.tips(img, this,{
+                    tips:[2, 'rgba(41,41,41,.5)']
+                    ,area: 'auto'
+                });
+            },function(){
+                layer.close(img_show);
+            });
+            // $('td #showuserinfo').attr('style','max-width:70px');
+        }
+
+        // 菜单开关
+        form.on('switch(is_supplier)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'supplier/supplier_status'//数据接口
+                , data: {
+                    "is_supplier": (obj.elem.checked) ? 1 : 2,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+
+        //审核
+        form.on('switch(capStatus)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'supplier/edit'//数据接口
+                , data: {
+                    "id": obj.value,
+                    "status": (obj.elem.checked) ? 1 : 0,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        search: demoReload.val()
+                    }
+                });
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('toolbar(test-table-autowidth)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            if(obj.event == 'checkok'){
+                var obtype = $(this).data('type');
+                var data = checkStatus.data;
+                if(data == ''){
+                    layer.msg('未选择任何供应商!', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 1000
+                    });
+                    return false;
+                }
+                layer.confirm((obtype == 2) ? '您确定要审核选择的供应商吗?':'您确定要封杀选择的供应商吗?', function(index){
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'supplier/edit'//数据接口
+                        , data: {
+                            "id": data,
+                            "type": obtype,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                            }, function(){
+                                location.reload();
+                            });
+                        }
+                    });
+                });
+            }else if(obj.event == 'addsupplier'){
+                    window.location.href = config.html_url+'supplier/add';
+            }
+        });
+
+        table.on('tool(test-table-autowidth)', function(obj){
+            var data = obj.data; //得到所在行所有键值
+            var id   = data.id;
+            if(obj.event == 'del'){
+                layer.confirm('删除供应商会影响与其相关数据，请谨慎处理', function(index){
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'supplier/del'//数据接口
+                        , data: {
+                            "id": id,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                            });
+                            location.reload();
+                        }
+                    });
+                });
+            }else if(obj.event === 'edite') {
+                console.log(data.id);
+                layer.open({
+                    type: 2
+                    ,title: '查看' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['700px', '700px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.html_url + 'supplier/edit_supplier/id=' + data.id
+                });
+            }
+
+
+        });
+    });
+</script>

@@ -1,0 +1,301 @@
+<style>
+    .layui-form-label{
+        padding: 9px 8px;
+        width: inherit;
+    }
+</style>
+<title>创券中心</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>创券中心</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header layui-form layuiadmin-card-header-auto" lay-filter="order-from-search">
+                    <div class="layui-form-item">
+
+
+                    </div>
+                    <input type="hidden" id="search" name="search">
+                </div>
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"> </table>
+                    <script type="text/html" id="toolbar">
+                        <!--<div class="layui-btn-container">-->
+                            <!--<button class="layui-btn" data-type="1"  lay-event="addcheckok">-->
+                                <!--<i class="layui-icon">&#xe654;</i>添加优惠券-->
+                            <!--</button>-->
+                        <!--</div>-->
+                    </script>
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs " lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs " lay-event="del"><i class="layui-icon layui-icon-edit"></i>删除</a>
+                    </script>
+                    <script type="text/html" id="switchTpl">
+                        <input type="checkbox" name="status" value="{{d.id}}"  lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table' , 'laydate' , 'util'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,form = layui.form
+            ,util = layui.util;
+
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'minus/getCouponList'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                {field:'coupon_name', title: '优惠券名称' , width:150,templet: function (d) {
+                        return d.coupon_name
+                    }},
+                {field:'coupon_type', title: '优惠券类型'  ,templet: function(d){
+                        if(d.coupon_type==1){
+                            return '<a class="layui-btn  layui-btn-danger layui-btn-xs">优惠券</a>';
+                        }
+                        else if(d.coupon_type==2){
+                            return '<a class="layui-btn layui-btn layui-btn-normal layui-btn-xs">新人券</a>';
+                        }else if(d.coupon_type==3){
+                            return '<a class="layui-btn layui-btn layui-btn-warm layui-btn-xs">节日券</a>';
+                        }
+                    }
+                },
+                {field:'send_type', title: '发放类型'  ,templet: function(d){
+                        if(d.send_type==1){
+                            return '<a class="layui-btn  layui-btn-danger layui-btn-xs">后台发放</a>';
+                        }else {
+                            return '<a class="layui-btn layui-btn layui-btn-normal layui-btn-xs">前端领取</a>';
+                        }
+                    }
+                },
+                {field:'full_money', title: '门槛金额' , templet: function (d) {
+                        return d.full_money
+                    }},
+                {field:'free_money', title: '优惠金额' , templet: function (d) {
+                        return d.free_money
+                    }},
+                {field:'max_num', title: '剩余张数' , templet: function (d) {
+                        return d.max_num
+                    }},
+                {field:'status', title: '状态'
+                    ,templet:  '#switchTpl', unresize: true
+                },
+
+                {field:'create_time', title: '创券时间', templet:function (d) {
+                        return layui.laytpl.toDateString(d.create_time *1000)
+                    }},
+                {field:'expiration_time', title: '过期时间', templet:function (d) {
+                        if(d.expiration_time<10000){
+                            return d.expiration_time+'天';
+                        }else {
+                            return layui.laytpl.toDateString(d.expiration_time *1000)
+                        }
+                    }},
+                {fixed: 'right', title:'操作', toolbar: '#rights',align: 'center',width:150}
+
+            ]]
+        });
+        form.on('switch(status)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'minus/changeCouponStatus'//数据接口
+                , data: {
+                    "id": obj.value,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+        form.render();
+
+        // 动态载入下拉选择
+        function jsonInit(objsons , object) {
+            $.each(objsons,function(idx,obj){
+                object.options.add(new Option(obj,idx));
+
+            });
+        }
+        //初始化json
+        var json = {};
+        form.on('select(aihao)', function(data){
+            var name = data.elem.name;
+            json.se = 1;
+            switch (name) {
+                case ("print_status"):
+                    json.print_status = data.value;
+                    break;
+                case ("captain"):
+                    json.cap_id = data.value;
+                    break;
+                case ("city"):
+                    json.cityid = data.value;
+                    break;
+                case ("delivery_time"):
+                    json.delivery_time = data.value;
+                    break;
+            }
+            JSON.stringify(json);
+            //执行重载
+            tableIns.reload( {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                ,where: {
+                    json
+                }
+            });
+        });
+
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload').val();
+                console.log(demoReload)
+                json.nickname = demoReload;
+                JSON.stringify(json);
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        json
+                    }
+                });
+            },
+
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        console.log(config.url + 'order/printer');
+
+        //监听工具条
+        table.on('toolbar(test-table-autowidth)', function(obj) {
+            if(obj.event == 'addcheckok'){
+                window.location.href = config.html_url+'minus/news';
+            }
+            var count = $('#printer_orders').data('count');
+            // var checkStatus = table.checkStatus(obj.config.id);
+            if(count == 0) {
+                layer.msg('未选择任何货单!', {
+                    offset: '15px'
+                    , icon: 2
+                    , time: 1000
+                });
+                return false;
+            }
+
+        });
+        table.on('tool(test-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'printer'){
+                layer.open({
+                    type: 2
+                    ,title: '查看' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['700px', '700px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'LAY_printer' //设定一个id，防止重复弹出
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.html_url + 'order/captainOrderDetail/id=' + data.id
+                });
+            }else if(obj.event == 'addcheckok'){
+                window.location.href = config.html_url+'minus/news';
+
+            }else if(obj.event == 'edit'){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'minus/getCouponType'//数据接口
+                    , data: {
+                        "id"   : data.id,
+                    },
+                    done: function (res) {
+                       if(res.data==3){
+                           window.location.href =config.html_url+'minus/news_edit_day/id='+data.id;
+
+                       }else {
+                           window.location.href =config.html_url+'minus/news_edit/id='+data.id;
+
+                       }
+                    }
+                });
+            }else if(obj.event == 'del'){
+                layer.confirm('您确定要删除选择?', function(index) {
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'minus/delCoupon'//数据接口
+                        , data: {
+                            "id"   : data.id,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                ,end:function () {
+                                }
+                            });
+                            window.location.reload();
+                        }
+                    });
+                })
+
+
+
+            }
+        });
+        table.on('edit(test-table-autowidth)', function(obj){
+            var id    = obj.data.id;
+            var value = obj.value;
+            admin.req({
+                type: 'POST',
+                url: config.url + 'goods/editsort'//数据接口
+                , data: {
+                    "id"   : id,
+                    "value": value,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                        ,end:function () {
+                        }
+                    });
+                }
+            });
+        });
+
+
+
+    });
+</script>

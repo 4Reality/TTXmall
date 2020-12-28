@@ -1,0 +1,214 @@
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>打印机配置</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">打印机配置</div>
+        <!--<blockquote class="layui-elem-quote">默认手动打印 多城市不能自动打印</blockquote>-->
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab">
+                <div class="layui-tab-content">
+                    <!--打印机配置内容-->
+                    <div class="layui-tab-item layui-show">
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="printer-form-group-xcx">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">选择打印机</label>
+
+                                <div class="layui-input-block">
+                                    <select id="uniquepr" name="uniquepr"  lay-filter="uploadchajian" >
+                                        <option value=0>飞鹅打印</option>
+                                        <option value=1>易联云打印</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="feie_printer">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">USER</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="obconfig[fie][user]"  placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">飞鹅云后台注册用户名</blockquote>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">UKEY</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="obconfig[fie][ukey]"  placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">飞鹅云注册账号后生成的UKEY</blockquote>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SN</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="obconfig[fie][sn]"   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">打印机编号</blockquote>
+                                </div>
+
+                            </div>
+
+                            <div id="yly_printer" style="display: none">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">用户ID</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="obconfig[yly][user_id]"  placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">易联云打印用户ID</blockquote>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">打印机终端号</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="obconfig[yly][machine_code]"  placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">易联云打印机终端号</blockquote>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">API密钥</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="obconfig[yly][apiKey]"   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">易联云打印机API密钥</blockquote>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">打印机密钥</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="obconfig[yly][msign]"   placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <blockquote style="margin-left: 110px" class="layui-elem-quote">易联云打印机密钥</blockquote>
+                                </div>
+
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">自动打印</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="isauto" value="1" lay-skin="switch" lay-text="开启|关闭">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="printer-form-sbmiy">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+    layui.use(['layer', 'form' , 'laydate'], function(){
+        //定义表单
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,form = layui.form;
+        form.render();
+        admin.req({
+            type:'POST',
+            url: config.url+'config_printer/index',//数据接口
+            data:{init:1},
+            done:function(res){
+                if(res.data){
+                    //预设元素
+                    form.val("printer-form-group-xcx", {
+                        "isauto": (res.data.isauto) ? 1 : 0,
+                        "uniquepr": res.data.uniquepr,
+                    });
+                    if(res.data.uniquepr == 0){
+                        $('#feie_printer').show();
+                        $('#yly_printer').hide();
+                        $('input[name="obconfig[fie][user]"]').val(res.data.obconfig.user);
+                        $('input[name="obconfig[fie][ukey]"]').val(res.data.obconfig.ukey);
+                        $('input[name="obconfig[fie][sn]"]').val(res.data.obconfig.sn);
+                    }else {
+                        $('#yly_printer').show();
+                        $('#feie_printer').hide();
+                        $('input[name="obconfig[yly][user_id]"]').val(res.data.obconfig.user_id);
+                        $('input[name="obconfig[yly][apiKey]"]').val(res.data.obconfig.apiKey);
+                        $('input[name="obconfig[yly][machine_code]"]').val(res.data.obconfig.machine_code);
+                        $('input[name="obconfig[yly][msign]"]').val(res.data.obconfig.msign);
+                    }
+
+                }
+                form.render();
+            }
+        });
+
+        form.on('select(uploadchajian)', function(data){
+            if(data.value==1){
+                $('#yly_printer').show();
+                $('#feie_printer').hide();
+            }else {
+                $('#feie_printer').show();
+                $('#yly_printer').hide();
+            }
+            admin.req({
+                type:'POST',
+                url: config.url+'config_printer/index',//数据接口
+                data:{type_id:data.value,},
+                done:function(res){
+                    if(res.data){
+                        //预设元素
+                        form.val("printer-form-group-xcx", {
+                            "isauto": (res.data.isauto) ? 1 : 0,
+                        });
+                        // 添加配置
+                         switch($('#uniquepr').val()){
+                             case '0':
+                                 $('input[name="obconfig[fie][user]"]').val(res.data.obconfig.user);
+                                 $('input[name="obconfig[fie][ukey]"]').val(res.data.obconfig.ukey);
+                                 $('input[name="obconfig[fie][sn]"]').val(res.data.obconfig.sn);
+                                break;
+                             case '1':
+                                 $('input[name="obconfig[yly][user_id]"]').val(res.data.obconfig.user_id);
+                                 $('input[name="obconfig[yly][apiKey]"]').val(res.data.obconfig.apiKey);
+                                 $('input[name="obconfig[yly][machine_code]"]').val(res.data.obconfig.machine_code);
+                                 $('input[name="obconfig[yly][msign]"]').val(res.data.obconfig.msign);
+                                 break;
+                         }
+                    }else{
+                        //预设元素
+                        form.val("printer-form-group-xcx", {
+                            "isauto": 0,
+                        });
+                    }
+                    form.render();
+                }
+            });
+
+        });
+
+        //监听提交
+        form.on('submit(printer-form-sbmiy)', function(data){
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'config_printer/save', //数据接口
+                data:data.field,
+                done:function(res){
+                    layer.msg('操作成功! O(∩_∩)O~ ', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                        ,end:function () {
+                            admin.events.refresh()
+                        }
+                    });
+                }
+            });
+        });
+
+
+    });
+</script>

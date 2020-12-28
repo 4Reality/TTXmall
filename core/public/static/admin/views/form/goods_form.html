@@ -1,0 +1,189 @@
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="layui-tab layui-tab-brief" lay-filter="activity-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">商品报表</li>
+                            <!--<li  id="notready">未绑定的团长</li>-->
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <table class="layui-hide" id="avtivty-table" lay-filter="avtivty-table"></table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-hide" id="avtivty-add-table" lay-filter="avtivty-add-table"></table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script id="city_text" type="text/html">
+                        <div>
+                            {{# layui.each(d.city_text, function(index, item){ }}
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" >{{ item }}</a>
+                            {{# }); }}
+                        </div>
+                    </script>
+                    <!--over-->
+
+                    <!-- 未选择的商品 -->
+                    <!-- over -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin', 'table'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,form    = layui.form;
+        var router = layui.router();
+        var id = router.search.id;
+        var end_time = router.search.end_time;
+        var dis = 0;
+        if(end_time < new Date().getTime()/1000){
+            $('#notready').empty();
+            dis = 1;
+        }
+        var tableIns = table.render({
+            elem: '#avtivty-table'
+            ,url: config.url+'form/formGoods'//数据接口
+            ,where:{
+                'cap_id':id,
+            }
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                {field:'goods_name', title: '商品'},
+                {field:'goods_headimage', title: '封面图' , width: 100  ,templet:'<div><img width="50px" height="25px" src="{{ d.goods_headimage }}"></div>'},
+
+                {field:'pay_price', title: '累计销售额',templet:function (d) {
+                        return '<b style="color: red">¥'+d.pay_price+'</b>';
+                    }},
+                {field:'cost_price', title: '累计成本',templet:function (d) {
+                        return '<b style="color: red">¥'+d.cost_price+'</b>';
+                    }},
+                {field:'profit_price', title: '累计利润',templet:function (d) {
+                        return '<b style="color: red">¥'+d.profit_price+'</b>';
+                    }},
+                {field:'goods_num', title: '销量',templet:function (d) {
+                        return '<b>'+d.goods_num+'</b>';
+                    }},
+
+            ]]
+        });
+
+        //监听工具条
+        table.on('toolbar(avtivty-add-table)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            if(obj.event == 'addcheckok'){
+                var obdata = checkStatus.data;
+                if(obdata == ''){
+                    layer.msg('未选择任何团长!', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 1000
+                    });
+                    return false;
+                }
+
+                // return false;
+                //掉删除接口
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'captain/bindCaptain'//数据接口
+                    ,
+                    data: {
+                        'data'   : obdata,
+                        'cap_id' : id,
+                        'type'   : 1
+                    },
+                    beforeSend: function () {
+                        layer.load(0, {
+                            offset: 'auto'
+                        });
+                    },
+                    done: function (res) {
+                        if(res.data == 200){
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            })
+                        }else{
+                            layer.msg(res.data, {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            });
+                        }
+
+                    }
+                });
+            }else if(obj.event == 'addAll'){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/addGoods'//数据接口
+                    , data: {
+                        'atvid' : id,
+                        'type' : 2
+                    },
+                    beforeSend: function () {
+                        layer.load(0, {
+                            offset: 'auto'
+                        });
+                    },
+                    done: function (res) {
+                        if(res.data == 200){
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            })
+                        }else{
+                            layer.msg(res.data, {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            });
+                        }
+
+                    }
+                });
+            }else if(obj.event == 'addGoods'){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/tiao'
+                    , data: {
+                        'atvid' : id,
+                    }
+                    ,done: function (res) {
+                        window.parent.layer.closeAll();
+                        window.parent.location.reload();
+                    }
+                });
+            }
+            return false;
+        });
+        //  -------------------------  未选的商品 OVER  -------------------------------------------
+
+    });
+</script>

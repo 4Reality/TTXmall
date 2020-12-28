@@ -1,0 +1,176 @@
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>清理订单</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">清理订单</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab">
+                <div class="layui-tab-content">
+                    <!--清理订单内容-->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">所属城市</label>
+                                <div class="layui-input-inline">
+                                    <select name="cityid" lay-verify="required" xm-select="select8" xm-select-radio xm-select-search="">
+                                        <option value="0" disabled="disabled"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">团长</label>
+                                <div class="layui-input-inline">
+                                    <select name="cap_id" lay-verify="required" xm-select="select-supplier" xm-select-radio xm-select-search="" >
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">配送时间</label>
+                                <div class="layui-input-inline">
+                                    <select name="delivery_time" lay-verify="required" lay-filter="aihao" lay-search="" id="delivery_time">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="minus-form-sbmiy">开始清单</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                            <!--<div class="layui-progress layui-progress-big" id="myloading" lay-showpercent="true" lay-filter="demo">
+                                <div class="layui-progress-bar" lay-percent="0%"></div>
+                            </div>-->
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin','layer', 'form' ,'element' ,'laydate', 'formSelects','util'], function() {
+        var $ = layui.$
+            ,admin = layui.admin
+            , upload = layui.upload
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,element = layui.element
+            ,formSelects = layui.formSelects
+            ,util = layui.util
+            ,form = layui.form;
+        form.render();
+        // 配送时间搜索
+        /*laydate.render({
+            elem: '#delivery_time'
+            ,value : util.toDateString(new Date(), 'yyyy-MM-dd')
+        });*/
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'order/clearOrder',//数据接口
+            done:function(res){
+                formSelects.data('select8', 'server', {
+                    url: config.url+'cities/selectlistAll',
+                    keyword: '',
+                });
+                var cityid = 0;
+                formSelects.on('select8', function(id, vals, val, isAdd, isDisabled){
+                    cityid = val.value;
+                    if(isAdd == false){
+                        cityid = 'no';
+                    }
+                    formSelects.data('select-supplier', 'server', {
+                        url: config.url+'captain/selectlistAll&cityid='+cityid,
+                        keyword: '',
+                    });
+                });
+                formSelects.btns([{
+                    icon: 'layui-icon',
+                    name: '请选择',
+                }]);
+                // 配送时间
+                var delivery_timelect = document.getElementById("delivery_time");
+                var delivery_time = res.data;
+                $.each(delivery_time,function(idx,obj){
+                    obobj = layui.laytpl.toDateString(obj *1000);
+                    delivery_timelect.options.add(new Option(obobj,obj));
+
+                });
+                form.render();
+                element.render('progress');
+            }
+        });
+
+        //监听提交
+        form.on('submit(minus-form-sbmiy)', function(data){
+            data.field.type = 1;
+            data.field.cargoid = 1;
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'order/clearOrder', //数据接口
+                data:data.field
+                ,xhr: function() {
+                    var xhr = $.ajaxSettings.xhr();
+                    if (xhr.upload) {
+                        xhr.upload.onprogress = function(progress) {
+                            layer.load(1, {
+                                offset: 'auto'
+                                ,shade: [0.8, '#393D49']
+                            });
+                            // console.log(progress);
+                            /*if (progress.lengthComputable) {
+                                var num = progress.loaded / progress.total * 100;
+                                element.progress('demo', num+'%')
+                                console.log(progress.total);
+                                console.log(progress.loaded)
+                            }*/
+
+                        };
+                    }
+                    return xhr;
+                }
+
+                ,done:function(res){
+                    if(res.data != 200){
+                        var msg = '网络有误! ≥...≤!!!';
+                        if(res.data == -4001)
+                            msg = '未找到订单! ≥...≤!!!';
+                        else if(res.data == -410)
+                            msg = '未找到活动 ≥...≤!!!';
+                        else if(res.data == -411)
+                            msg = '活动时间未结束! ≥...≤!!!';
+                        else if(res.data == -4010)
+                            msg = '请先清理供应商! ≥...≤!!!';
+                        layer.msg(msg, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 1000
+                            ,end:function () {
+                                layer.closeAll();
+                            }
+                        });
+                    }else{
+                        layer.msg('操作成功!~O(∩_∩)O~!!!', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                            ,end:function () {
+                                window.location.href = config.html_url+'order/clearList'
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>

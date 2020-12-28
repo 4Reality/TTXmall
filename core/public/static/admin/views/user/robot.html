@@ -1,0 +1,89 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">添加虚拟用户</div>
+      <blockquote style="color: red" class="layui-elem-quote">添加虚拟用户用于添加虚拟销量</blockquote>
+      <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-add">
+        <div class="layui-form-item">
+          <label class="layui-form-label">添加个数</label>
+          <div class="layui-input-block">
+            <input type="text" name="time" lay-verify="required|lengthnow" autocomplete="off" placeholder="请输入需要添加的个数" class="layui-input">
+          </div>
+
+
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-add-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script>
+      layui.use(['admin','layer','upload', 'form' , 'formSelects'], function() {
+          var $ = layui.$
+              ,admin = layui.admin
+              , upload = layui.upload
+              ,layer = layui.layer
+              ,formSelects = layui.formSelects
+              ,form = layui.form;
+          var layedit;
+          // layui.use('layedit', function(){
+          //    layedit = layui.layedit;
+          //     var url=config.url+'base_admin/upload';
+          //     index = layedit.build('goods_content',{
+          //         height:300,
+          //         uploadImage:{url: url, type: 'post'}
+          //
+          //     }); //建立编辑器
+          // });
+          //
+          // layui.use('form', function() {
+          //     form.render();
+          // });
+          /* 监听提交 */
+          form.on('submit(goods-cat-form-add-submit)', function(data){
+              // data.field.goods_content = layedit.getContent(editIndex);
+              $.post(config.url+'user/addRobot',
+                  data.field,
+                  function(res){
+                   console.log(res);
+                    if(res.data == -411){
+                      layer.alert('最多只能添加100个虚拟用户！', function(index){
+                        window.parent.layer.closeAll();
+                        window.parent.location.reload();
+                      });
+                    }else if(res.msg == -412){
+                      layer.alert('您最多还能添加'+res.data+'个虚拟用户！', function(index){
+                        window.parent.layer.closeAll();
+                        window.parent.location.reload();
+                      });
+                    }else if(res.data == 200){
+                         layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                             window.parent.layer.closeAll();
+                             window.parent.location.reload();
+                         });
+                     }
+
+
+
+              });
+              return false;
+          });
+          /* 自定义验证规则 */
+          form.verify({
+              content: function(value) {//验证富文本编辑器
+                  return layedit.sync(index);
+              },
+          });
+
+          $('.del-image').on('click','.layui-icon', function () {
+              $(this).parents('dd').remove();
+          });
+
+
+      });
+  </script>
+

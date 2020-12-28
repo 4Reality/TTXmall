@@ -1,0 +1,200 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">添加活动</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab">
+                <div class="layui-tab-content">
+                    <!--添加活动内容-->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="activity-form-group-xcx">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">开始时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="start_time" autocomplete="off" class="layui-input" lay-verify="required" id="start_time" placeholder="请选择活动开始时间">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">结束时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="end_time" autocomplete="off" class="layui-input" lay-verify="required" id="end_time" placeholder="请选择活动结束时间">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">配送时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="delivery_time" autocomplete="off" class="layui-input" lay-verify="required" id="delivery_time" placeholder="请选择送达时间">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">订单关闭时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="order_end_time" lay-verify="required|number" class="layui-input"  placeholder="请选择订单时间(单位:分钟)">
+                                    <blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">* 亲.注意注意!!!：只能填数字哟(单位：分钟) 此值为未付款订单自动取消时间</blockquote>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="activity-form-group-editsubmit">确认编辑</button>
+                                    <button class="layui-btn layui-btn-danger" lay-submit lay-filter="activity-endatv">结束活动</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form' , 'laydate'], function(){
+        //定义表单
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,form = layui.form;
+        //常规用法
+        laydate.render({
+            elem: '#start_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+        });
+        //常规用法
+        laydate.render({
+            elem: '#end_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+        });
+        var router = layui.router();
+        var id = router.search.id;
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+        //常规用法
+        laydate.render({
+            elem: '#delivery_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+            ,done: function(value, date){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/checkDelt', //数据接口
+                    data: {dtime:value},
+                    done: function (res) {
+                        if(res.data == -2001){
+                            layer.msg('配送时间不能重复喔! ≥...≤!~', {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                            });
+                            $('#delivery_time').val('')
+                        }
+                    }
+                });
+            }
+        });
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'activity/edit&id='+id,//数据接口
+            done:function(res){
+                if(res.data){
+                    //预设元素
+                    form.val("activity-form-group-xcx", {
+                        "id": res.data.id,
+                        "open_auto":(res.data.open_auto) ? 1 : 0,
+                        "act_name": res.data.act_name,
+                        "start_time": layui.laytpl.toDateString(res.data.start_time *1000),
+                        "end_time":  layui.laytpl.toDateString(res.data.end_time *1000),
+                        "delivery_time": layui.laytpl.toDateString(res.data.delivery_time *1000),
+                        "order_end_time": res.data.order_end_time,
+                    });
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(activity-form-group-editsubmit)', function(data){
+            data.field.id = id;
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'activity/edit', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data != true){
+                        var msg = '';
+                        switch(res.data){
+                            case -2001:
+                                msg = '该时间段 已有团购活动，请填写新的团购活动日期! ≥...≤!~ ';
+                                break;
+                            case -2006:
+                                msg = '结束时间不能比待开始的活动开始时间大喔! ≥...≤!~ ';
+                                break;
+                            case -2003:
+                                msg = '亲,开始时间不能小于结束时间哟! ≥...≤!~ ';
+                                break;
+                            case -2004:
+                                msg = '配送时间不能小于结束时间哟! ≥...≤!~ ';
+                                break;
+                            case -2005:
+                                msg = '添加失败,请重试! ≥...≤!~';
+                                break;
+                        }
+                        layer.msg(msg, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }else{
+                        layer.msg('修改成功啦! ≥ ▽ ≤', {
+                            offset: 'auto'
+                            , icon: 1
+                            , time: 1000
+                            ,end:function () {
+                                window.parent.layer.closeAll();
+                                window.parent.location.reload()
+                            }
+                        })
+                    }
+                }
+            });
+        });
+
+        //  结束活动
+        form.on('submit(activity-endatv)', function(data){
+            layer.confirm('您确定立即结束活动吗?', function(index){
+                var atvid = id;
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/nowendatv',//数据接口
+                    data:{
+                        'atvid' : atvid,
+                    },
+                    beforeSend: function () {
+                        layer.load(0, {
+                            offset: 'auto'
+                        });
+                        layer.close(index);
+                    },
+                    done: function (res) {
+                        layer.msg('活动结束成功啦! ≥ ▽ ≤', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 2000
+                            ,end:function () {
+                                window.parent.layer.closeAll();
+                                window.parent.location.reload();
+                            }
+                        });
+                    }
+                });
+            })
+        })
+    });
+</script>

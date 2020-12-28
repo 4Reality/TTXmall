@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{$Think.const.APP_STATIC_PATH}layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="{$Think.const.APP_STATIC_PATH}layui/css/main.css" media="all">
+  <style type="text/css">
+    .hide{display:none}
+  </style>
+</head>
+<body>
+  <div id="LAY_app"></div>
+  <script src="{$Think.const.APP_STATIC_PATH}layui/layui.js"></script>
+
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header"></div>
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-form">
+        <div class="layui-form-item">
+          <label class="layui-form-label">商品名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="goods_name" lay-verify="required|title" autocomplete="off" placeholder="请输入商品名称" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">原价</label>
+          <div class="layui-input-block">
+            <input type="text" name="init_price" lay-verify="required|number" autocomplete="off" placeholder="请输入商品原价" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">活动价</label>
+          <div class="layui-input-block">
+            <input type="text" name="price" lay-verify="required|number" autocomplete="off" placeholder="请输入商品活动价" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">复选框</label>
+          <div class="layui-input-block">
+            <input type="checkbox" name="type[0]" title="限购" checked>
+            <input type="checkbox" name="type[1]" title="满减" >
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">分销比例(百分比)</label>
+          <div class="layui-input-block">
+            <input type="text" name="fx_ratio" lay-verify="required|number" autocomplete="off" placeholder="请输入商品分层XXX%" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">库存</label>
+          <div class="layui-input-block">
+            <input type="text" name="stock" lay-verify="required|number" autocomplete="off" placeholder="请输入商品库存" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">规格</label>
+          <div class="layui-input-block">
+            <input type="text" name="norms" lay-verify="required" autocomplete="off" placeholder="请输入商品规格" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">预计送达时间(XX天)</label>
+          <div class="layui-input-block">
+            <input type="text" name="delivery_time" lay-verify="required|number" autocomplete="off" placeholder="请输入商品送达时间" value="1" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">图片</label>
+          <div class="layui-upload">
+            <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button>
+            <div class="layui-upload-list">
+              <img style="margin-left: 110px;" width="100px" class="layui-upload-img" id="test-upload-normal-img">
+              <p id="test-upload-demoText"></p>
+              <!--隐藏域-->
+              <input type="hidden" name="goods_image" id="cover_value">
+            </div>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">图片</label>
+          <div class="layui-upload">
+            <button type="button" class="layui-btn" id="test-upload-normal2">多图片上传</button>
+            <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+              预览图：
+              <div class="layui-upload-list" id="test-upload-normal-img2"></div>
+            </blockquote>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">商品介绍</label>
+          <div class="layui-input-block">
+              <textarea class="layui-textarea" name="goods_content" id="LAY_demo2" style="display: none"></textarea>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-form-add">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+		  <div>&#22823;&#37327;&#28304;&#30721;&#65292;&#25345;&#32493;&#26356;&#26032;&#65306;&#119;&#119;&#119;&#46;&#108;&#97;&#110;&#114;&#101;&#110;&#122;&#104;&#105;&#106;&#105;&#97;&#46;&#99;&#111;&#109;</div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+      layui.use(['layer','layedit','upload', 'form'], function() {
+          var $ = layui.jquery
+              , upload = layui.upload
+              ,layedit =layui.layedit
+              ,layer = layui.layer
+              ,form = layui.form;
+          var url = '{:cookie("init_url")}&s=/admin/';
+          //普通图片上传
+          var uploadInst = upload.render({
+              elem: '#test-upload-normal'
+              , url: url+'base_admin/upload'
+              ,data:{"type":"picture"}
+              , before: function (obj) {
+                  obj.preview(function (index, file, result) {
+                      $('#test-upload-normal-img').attr('src', result); //图片链接（base64）
+                  });
+              }
+              , done: function (res) {
+                  //如果上传失败
+                  if (res.code > 0) {
+                      return layer.msg('上传失败');
+                  }
+                  //上传成功
+                  $('#cover_value').val(res.data.id);
+              }
+              , error: function () {
+                  //演示失败状态，并实现重传
+                  var demoText = $('#test-upload-demoText');
+                  demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                  demoText.find('.demo-reload').on('click', function () {
+                      uploadInst.upload();
+                  });
+              }
+          });
+          layedit.set({
+              uploadImage: {
+                  url: url+'base_admin/upload'
+                  ,type: 'post'
+              }
+          });
+          editIndex = layedit.build('LAY_demo2', {
+              tool: ['image']
+              ,height: 200
+          });
+
+          /* 监听提交 */
+          form.on('submit(goods-form-add)', function(data){
+              data.field.goods_content = layedit.getContent(editIndex);
+              $.post(url+'goods/add',
+                  data.field,
+                  function(res){
+                     if(res.code == 0){
+                         layer.alert('添加成功!', function(index){
+                             window.parent.layer.closeAll();
+                             window.parent.location.reload()
+                         });
+                     }else{
+                         layer.alert(res.data);
+                     }
+              });
+              return false;
+          });
+          //多图片上传
+          upload.render({
+              elem: '#test-upload-normal2'
+              ,url: url+'base_admin/upload'
+              ,data:{"type":"picture"}
+              ,multiple: true
+              ,before: function(obj){
+                  //预读本地文件示例，不支持ie8
+                  obj.preview(function(index, file, result){
+                      $('#test-upload-normal-img2').append('<img width="100px" src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img">')
+                  });
+              }
+              ,done: function(res){
+                  //上传完毕
+                  if (res.code > 0) {
+                      return layer.msg('上传失败');
+                  }
+                  $('#test-upload-normal-img2').append('<input type="hidden" name="goods_images[]" value="'+res.data.id+'" id="cover_value">')
+              }
+          });
+      });
+  </script>
+</body>
+
+</html>
+
+

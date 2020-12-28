@@ -1,0 +1,105 @@
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">添加分类</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-edit">
+        <div class="layui-form-item">
+          <label class="layui-form-label">分类名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="content" lay-verify="required|lengthnow" autocomplete="off" placeholder="请输入分类名称" class="layui-input">
+          </div>
+
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">分类排序</label>
+          <div class="layui-input-block">
+            <input type="text" name="sort" lay-verify="required|number" autocomplete="off" placeholder="数字越大分类越靠前" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-edit-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['admin','layer','upload', 'form' , 'layedit' , 'formSelects'], function() {
+    var $ = layui.$
+            ,admin = layui.admin
+            , upload = layui.upload
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,formSelects = layui.formSelects
+            ,form = layui.form;
+
+    var router = layui.router();
+    var id = router.search.id;
+    if(typeof(id)=='undefined'){
+      id=0;//默认新增
+    }
+
+    form.verify({
+      lengthnow: function(value){
+        if(value.length > 20){
+          return '商品至多只能是20字呀! ≥...≤!~';
+        }
+      }
+    });
+    index = layedit.build('goods_content',{
+      height:300,
+      uploadImage:{url: config.url+'base_admin/upload', type: 'post'}
+
+    }); //建立编辑器
+    //发送请求获取数据(数据的回显)
+    admin.req({
+      type:'POST',
+      url: config.url+'goods_cat/edit'//数据接口
+      ,data:{"id":id},
+      done:function(res){
+        console.log(res)
+        if(res.data){
+          //预设元素
+          form.val("goods-cat-form-edit", {
+            "content": res.data.content,
+            "sort"   : res.data.sort,
+          });
+
+        }
+        formSelects.render();
+      }
+    });
+    layui.use('form', function() {
+      form.render();
+    });
+    $('.del-image').on('click','.layui-icon', function () {
+      $(this).parents('dd').remove();
+    });
+    /* 监听提交 */
+    form.on('submit(goods-cat-form-edit-submit)', function(data){
+      data.field.id = id;
+      $.post(config.url+'goods_cat/edit',
+              data.field,
+              function(res){
+                if(res.code == 0){
+                  layer.alert('修改成功! ≥ ▽ ≤', function(index){
+                      window.parent.layer.closeAll();
+                      window.parent.location.reload()
+                  });
+                }else{
+                  layer.alert(res.data);
+                }
+              });
+      return false;
+    });
+    /* 自定义验证规则 */
+    form.verify({
+      content: function(value) {//验证富文本编辑器
+        return layedit.sync(index);
+      },
+    });
+  });
+</script>
+

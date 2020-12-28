@@ -1,0 +1,67 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">充值设置</div>
+      <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-add">
+        <div class="layui-form-item">
+          <label class="layui-form-label">充值金额</label>
+          <div class="layui-input-block">
+            <input type="text" name="recharge" lay-verify="required|number" autocomplete="off"  class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">赠送金额</label>
+          <div class="layui-input-block">
+            <input type="text" name="return_money" lay-verify="required|number" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">赠送积分</label>
+          <div class="layui-input-block">
+            <input type="text" name="return_integral" lay-verify="required|number" autocomplete="off"  class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">设置状态</label>
+          <div class="layui-input-inline" style="width:70px">
+            <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭" lay-filter="status">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-add-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+    layui.use(['admin','layer','upload', 'form' , 'formSelects'], function() {
+        var $            = layui.$
+            ,layer       = layui.layer
+            ,form        = layui.form;
+        layui.use('form', function() {
+            form.render();
+        });
+        form.on('submit(goods-cat-form-add-submit)', function(data){
+            $.post(config.url+'user/rechargeAdd',
+                data.field,
+                function(res){
+                   if(res.code == 0){
+                       layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                           window.parent.layer.closeAll();
+                           window.parent.location.reload()
+                       });
+                   }else{
+                       layer.msg(res.data, {
+                           icon: 2
+                       })
+                   }
+            });
+            return false;
+        });
+    });
+</script>
+

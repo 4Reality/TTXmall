@@ -1,0 +1,83 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">添加滚动图</div>
+      <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="template-from">
+        <div class="layui-form-item">
+          <label class="layui-form-label">请选择上传插件</label>
+          <div class="layui-input-block">
+            <select id="type" name="type" >
+              <option value=0>订单领取到货通知</option>
+              <option value=1>付款成功通知</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">小程序模板消息ID</label>
+          <div class="layui-input-block">
+            <input type="text" name="template_id" lay-verify="required" autocomplete="off" placeholder="请输入小程序模板消息ID" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">公众号序模板消息ID</label>
+          <div class="layui-input-block">
+            <input type="text" name="mp_template_id" lay-verify="required" autocomplete="off" placeholder="请输入公众号模板消息ID" class="layui-input">
+          </div>
+        </div>
+        <!--<div class="layui-form-item">
+          <label class="layui-form-label">跳转链接</label>
+          <div class="layui-input-block">
+            <input type="text" name="link" lay-verify="required" autocomplete="off" placeholder="请输入跳转链接" class="layui-input">
+          </div>
+        </div>-->
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="template-from-add-submit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script>
+
+     console.log(config.url)
+
+      layui.use(['admin','layer','upload', 'form'], function() {
+          var $ = layui.$
+              ,admin = layui.admin
+              , upload = layui.upload
+              ,layer = layui.layer
+              ,form = layui.form;
+
+
+          //监听提交
+          form.on('submit(template-from-add-submit)', function(data){
+              //发送请求
+              admin.req({
+                  type:'POST',
+                  url: config.url+'config_template/add', //数据接口
+                  data:data.field,
+                  done:function(res){
+                      $msg = '操作成功! ≥ ▽ ≤';
+                      icon = 1;
+                      if(res.data != 200){
+                          $msg = (res.data == -401) ? '模板消息已经存在,无需重复添加! ≥...≤!~' : '网络有误!';
+                          icon = 2;
+                      }
+                      layer.msg($msg, {
+                          offset: 'auto'
+                          , icon: icon
+                          , time: 2000
+                          ,end:function () {
+                              window.parent.layer.closeAll();
+                              window.parent.location.reload()
+                          }
+                      })
+                  }
+              });
+          });
+      });
+  </script>
+

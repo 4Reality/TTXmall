@@ -1,0 +1,94 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">添加分销</div>
+      <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-add">
+        <div class="layui-form-item">
+          <label class="layui-form-label">等级名字</label>
+            <div class="layui-input-inline">
+              <input type="text" name="content" lay-verify="required" autocomplete="off"  class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">分销比例</label>
+          <div class="layui-input-inline">
+            <input type="text" name="balance" lay-verify="required|number" autocomplete="off"  class="layui-input">
+          </div>
+          <span style="    font-size: 20px;
+    font-weight: 400;
+    line-height: 38px;
+    text-align: right;">%</span>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-add-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script>
+      layui.use(['admin','layer','upload', 'form' , 'formSelects'], function() {
+          var $ = layui.$
+              ,admin = layui.admin
+              , upload = layui.upload
+              ,layer = layui.layer
+              ,formSelects = layui.formSelects
+              ,form = layui.form;
+          var layedit;
+          layui.use('layedit', function(){
+             layedit = layui.layedit;
+              var url=config.url+'base_admin/upload';
+              index = layedit.build('goods_content',{
+                  height:300,
+                  uploadImage:{url: url, type: 'post'}
+
+              }); //建立编辑器
+          });
+          form.verify({
+              lengthnow: function(value){
+                  if(value.length > 20){
+                      return '商品至多只能是20字呀! ≥...≤!~';
+                  }
+              }
+          });
+          layui.use('form', function() {
+              form.render();
+          });
+          /* 监听提交 */
+          form.on('submit(goods-cat-form-add-submit)', function(data){
+              // data.field.goods_content = layedit.getContent(editIndex);
+              $.post(config.url+'captain/addFx',
+                  data.field,
+                  function(res){
+                console.log(res);
+                     if(res.code == 0){
+                         layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                             window.parent.layer.closeAll();
+                             window.parent.location.reload()
+                         });
+                     }else{
+                         layer.msg(res.data, {
+                             icon: 2
+                         })
+                     }
+              });
+              return false;
+          });
+
+          /* 自定义验证规则 */
+          form.verify({
+              content: function(value) {//验证富文本编辑器
+                  return layedit.sync(index);
+              },
+          });
+
+          $('.del-image').on('click','.layui-icon', function () {
+              $(this).parents('dd').remove();
+          });
+
+
+      });
+  </script>
+

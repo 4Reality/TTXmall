@@ -1,0 +1,81 @@
+
+<title>广告管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>广告管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">广告管理</div>
+        <div class="layui-card-body" style="padding: 15px;">
+
+            <form class="layui-form" action="" lay-filter="component-form-group">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">选择广告位</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="type" value=2 title="人脉集市-广告位">
+                        </div>
+                    </div>
+                    <!--图标-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">图片</label>
+                        <div class="layui-upload">
+                            <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button>
+                            <div class="layui-upload-list">
+                                <img style="margin-left: 100px" class="layui-upload-img" id="test-upload-normal-img">
+                                <p id="test-upload-demoText"></p>
+                                <!--隐藏域-->
+                                <input type="hidden" name="path" id="cover_value">
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">跳转类型</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="link_type" value=1 title="拨打电话">
+                        <input type="radio" name="link_type" value=2 title="跳转小程序">
+                        <input type="radio" name="link_type" value=3 title="跳转网页">
+                    </div>
+                </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">跳转链接</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="link" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <!--状态-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="status" value=1 title="正常">
+                            <input type="radio" name="status" value=0 title="隐藏">
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="LAY-filter-demo-form">立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin', 'form'], function(){
+        alert(1)
+    });
+</script>

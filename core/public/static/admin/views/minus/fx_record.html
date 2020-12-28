@@ -1,0 +1,108 @@
+
+<title>分销记录</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>分销记录</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">分销记录</div>
+                <!--<blockquote style="color: red" class="layui-elem-quote">点击上(下)架即可更改状态哟 ~ O(∩_∩)O~</blockquote>-->
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-bottom: 10px;">
+                        搜索：
+                        <div class="layui-inline">
+                            <input class="layui-input" name="search" placeholder="搜索订单号" id="demoReload" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+                    </div>
+
+                    <table class="layui-hide" id="test-table-autowidth-cat" lay-filter="test-table-autowidth-cat"></table>
+
+
+
+                    <script type="text/html" id="switchTpl">
+                        <input style="width: 200px" type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                    <!--图片-->
+
+                    <script type="text/html" id="rights">
+
+                        {{ (d.status == 1) ? '<a class="layui-btn layui-bg-cyan layui-btn-xs " lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>' : '<a class="layui-btn layui-btn-disabled layui-btn-xs"><i class="layui-icon layui-icon-edit"></i>编辑</a>' }}
+
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin', 'table'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,form    = layui.form;
+        var tableIns = table.render({
+            elem: '#test-table-autowidth-cat'
+            ,url: config.url+'minus/fxRecord'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                // {checkbox: true},
+                // {field:'id', title: 'ID', width: 50},
+                {field:'order_code', title: '订单号', width: 250},
+                {field:'status', title: '到账状态'  , width:110,templet: function(d){
+                        if(d.status==0){
+                            return '<a class="layui-btn  layui-btn-danger layui-btn-xs">未到账</a>';
+                        } else if(d.status==1){
+                            return '<a class="layui-btn layui-btn layui-btn-normal layui-btn-xs">已到账</a>';
+                        }
+                    }
+                },
+                {field:'u_name', title: '获取佣金用户',width: 200},
+                {field:'c_name', title: '购买用户',width: 200},
+                {field:'cash', title: '分销金额',width: 200},
+                {field:'level', title: '分销等级',width: 200},
+                {field:'time', title: '分销时间', width:400, templet:function (d) {
+                        return layui.laytpl.toDateString(d.time *1000)
+                    }},
+            ]]
+        });
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        search: demoReload.val()
+                    }
+                });
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+
+
+
+
+
+
+    });
+</script>

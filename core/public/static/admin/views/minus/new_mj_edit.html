@@ -1,0 +1,87 @@
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">添加满减</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-edit">
+        <div class="layui-form-item">
+          <div class="layui-form-item">
+            <label class="layui-form-label">满减状态</label>
+            <div class="layui-input-block">
+              <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">满</label>
+            <div class="layui-input-block">
+              <input type="text" name="full" id="date1" autocomplete="off" class="layui-input"  placeholder="元">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">减</label>
+            <div class="layui-input-inline">
+              <input type="text" name="discount" autocomplete="off" class="layui-input" placeholder="元">
+            </div>
+          </div>
+
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-add-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['admin','layer','upload', 'form' , 'layedit' , 'formSelects'], function() {
+    var $        = layui.$
+        ,admin   = layui.admin
+        , upload = layui.upload
+        ,layer   = layui.layer
+        ,layedit = layui.layedit
+        ,formSelects = layui.formSelects
+        ,form    = layui.form;
+
+    var router = layui.router();
+    var id = router.search.id;
+    if(typeof(id)=='undefined'){
+      id=0;//默认新增
+    }
+    admin.req({
+      type:'POST',
+      url: config.url+'minus/editMj'//数据接口
+      ,data:{"id":id},
+      done:function(res){
+        if(res.data){
+          form.val("goods-cat-form-edit", {
+            "status"   : (res.data.status) ? 1 : 0,
+            "full"     : res.data.full,
+            "discount" : res.data.discount,
+          });
+        }
+        formSelects.render();
+      }
+    });
+    layui.use('form', function() {
+      form.render();
+    });
+    /* 监听提交 */
+    form.on('submit(goods-cat-form-add-submit)', function(data){
+      data.field.id = id;
+      $.post(config.url+'minus/editMj',
+              data.field,
+              function(res){
+                if(res.code == 0){
+                  layer.alert('修改成功! ≥ ▽ ≤', function(index){
+                    window.location.href =config.html_url+'minus/new_mj';
+                  });
+                }else{
+                  layer.alert(res.data);
+                }
+              });
+      return false;
+    });
+  });
+</script>
+

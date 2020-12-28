@@ -1,0 +1,151 @@
+1
+<!--
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{$Think.const.APP_STATIC_PATH}layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="{$Think.const.APP_STATIC_PATH}layui/css/main.css" media="all">
+    <style type="text/css">
+        .hide{display:none}
+    </style>
+</head>
+<body>
+<div id="LAY_app"></div>
+<script src="{$Think.const.APP_STATIC_PATH}layui/layui.js"></script>
+<title>已选择的商品</title>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="layui-tab layui-tab-brief" lay-filter="activity-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">已添加的商品</li>
+                            <li>未添加的商品</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <table class="layui-hide" id="avtivty-table" lay-filter="avtivty-table"></table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-hide" id="avtivty-add-table" lay-filter="avtivty-add-table"></table>
+                            </div>
+                        </div>
+                    </div>
+
+                    &lt;!&ndash; 已选择的商品 &ndash;&gt;
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs"  lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+                    </script>
+
+                    <script id="city_text" type="text/html">
+                        <div>
+                            {{# layui.each(d.city_text, function(index, item){ }}
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" >{{ item }}</a>
+                            {{# }); }}
+                        </div>
+                    </script>
+                    &lt;!&ndash;over&ndash;&gt;
+
+                    &lt;!&ndash; 未选择的商品 &ndash;&gt;
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加所选
+                            </button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="2"  lay-event="addAll">
+                                <i class="layui-icon">&#xe654;</i>一键添加所有
+                            </button>
+                        </div>
+                    </script>
+                    &lt;!&ndash; over &ndash;&gt;
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['table' , 'element'], function(){
+        var $ = layui.jquery
+            ,element = layui.element;
+        var table = layui.table;
+        var url = '{:cookie("init_url")}&s=/admin/';
+        var tab_item = 0;
+        element.on('tab(activity-tab)', function(data){
+            tab_item = data.index;
+        });
+        //  &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
+        // 已选择的活动商品
+        table.render({
+            elem: '#avtivty-table'
+            ,url: url+'activity/activgoods'
+            ,page: true
+            ,limit: 5
+            ,cols: [[
+                {field: 'id', title: 'ID', width: 80, sort: true}
+                ,{field: 'goods_name', title: '商品名称', width: 120}
+                ,{field:'init_price', title: '原价', width:80}
+                ,{field:'price', title: '活动价', width:80}
+                ,{field:'stock', title: '库存', width:80}
+                ,{field:'city', title: '城市',templet:'#city_text', align:'center'}
+                ,{fixed: 'right', title:'删除', toolbar: '#rights'}
+            ]]
+            ,data: {$row}
+            ,even: true
+        });
+        table.on('tool(avtivty-table)', function(obj){
+
+            var data = obj.data;
+            data.atvid = '{$id}';
+            if(obj.event === 'del'){
+                layer.confirm('您确定要移出商品吗?', function(index){
+                layer.close(index);
+                $.post(url+'activity/delatvgoods',
+                    data,
+                    function(res){
+                        if(res == true){
+                            layer.msg('删除成功! ≥...≤!!!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                });
+                            obj.del();
+                        }else{
+                            layer.alert('删除失败啦! ≥...≤!!!');
+                        }
+                    });
+                });
+            }
+        });
+        //  -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; 已选的商品 OVER  -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
+
+        //  -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; 未选择的商品 -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
+        // 已选择的活动商品
+        table.render({
+            elem: '#avtivty-add-table'
+            ,page: true
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cols: [[
+                {field: 'id', title: 'ID', width: 80, sort: true}
+                ,{field: 'goods_name', title: '商品名称', width: 120}
+                ,{field:'init_price', title: '原价', width:80}
+                ,{field:'price', title: '活动价', width:80}
+                ,{field:'stock', title: '库存', width:80}
+                ,{field:'city', title: '城市',templet:'#city_text', align:'center'}
+            ]]
+            ,data: {$row}
+            ,even: true
+        });
+        //  -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;  未选的商品 OVER  -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
+
+    });
+</script>
+</body>
+
+</html>-->

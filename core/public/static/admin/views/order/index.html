@@ -1,0 +1,584 @@
+<style>
+    .layui-form-label{
+        padding: 10px 8px;
+        width: inherit;
+    }
+    .layui-form-item .layui-inline{
+        margin-right: 60px;
+    }
+</style>
+<title>订单管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>订单管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header layui-form layuiadmin-card-header-auto" lay-filter="order-from-search">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">订单状态</label>
+                            <div class="layui-input-inline">
+                                <select name="pay_type" lay-filter="aihao" class="pay_type">
+                                    <option value="">全部</option>
+                                    <option value="0">未付款</option>
+                                    <option value="1">已付款</option>
+                                    <option value="2">团长待收货</option>
+                                    <option value="3">用户待提货</option>
+                                    <option value="4">交易完成</option>
+                                    <option value="-1">取消订单</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">所属团长</label>
+                            <div class="layui-input-inline">
+                                <select name="captain" lay-verify="required" lay-filter="aihao" lay-search="" id="captain">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline" >
+                            <label class="layui-form-label">所属城市</label>
+                            <div class="layui-input-inline">
+                                <select name="city" lay-verify="required" lay-filter="aihao" lay-search="" id="city">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline" >
+                            <label class="layui-form-label">活动期数</label>
+                            <div class="layui-input-inline" >
+                                <select name="atv_id" lay-verify="required" lay-filter="aihao" lay-search="" id="atvs">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline" >
+                            <label class="layui-form-label" >下单时间</label>
+                            <div class="layui-input-inline" >
+                                <input type="text" class="layui-input" id="create_end_time" placeholder="~">
+                            </div>
+                        </div>
+                        <div class="layui-inline" >
+                            <label class="layui-form-label">配送时间</label>
+                            <div class="layui-input-inline">
+                                <select name="delivery_data" lay-verify="required" lay-filter="aihao" lay-search="" id="delivery_data">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="search" name="search">
+
+                </div>
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-bottom: 10px;">
+                        搜索：
+                        <div class="layui-inline">
+                            <input class="layui-input" name="search" placeholder="订单号" id="demoReload" autocomplete="off">
+                        </div>
+                        <div class="layui-inline">
+                            <input class="layui-input" name="search" placeholder="商品名" id="goods_name" autocomplete="off">
+                        </div>
+                        <div class="layui-inline">
+                            <input class="layui-input" name="search" placeholder="微信昵称" id="nickname" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+                        <button class="layui-btn" data-type="excel_order">
+                        导出
+                        </button>
+
+                    </div>
+                    <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"> </table>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" lay-event="allsend" id="send_orders">
+                                <i class="layui-icon">&#xe609;</i>一键全部发货
+                            </button>
+                            <button class="layui-btn" lay-event="allprinter" id="printer_orders">
+                                <i class="layui-icon">&#xe609;</i>一键全部打印
+                            </button>
+
+                        </div>
+                    </script>
+                    <script type="text/html" id="showimg">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" data-type="{{ d.uid.headimage }}" id="showuserinfo" ><i class="layui-icon">&#xe66f;</i>{{ d.uid.nickname }}</a>
+                    </script>
+                    <script type="text/html" id="rights">
+                        {{ (d.pay_type >= 1) ? '<a class="layui-btn layui-btn-primary layui-btn-xs" data-printer="1"  lay-event="printer"><i class="layui-icon layui-icon-note"></i>打印</a>' : '<a class="layui-btn layui-btn-disabled layui-btn-xs"><i class="layui-icon layui-icon-note"></i>打印</a>' }}
+                        <a class="layui-btn layui-btn-primary layui-btn-xs"  lay-event="detail"><i class="layui-icon">&#xe642;</i>查看</a>
+                    </script>
+                    <script type="text/html" id="showimgs">
+                        {{ (d.pay_type >= 1&&d.fx_price==0) ? '<a class="layui-btn layui-btn-primary layui-btn-xs"  data-type=""  lay-event="detail_fx" >点击查看</a>' : '' }}
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    console.log('{:cookie("init_url")}')
+
+    layui.use(['admin', 'table' , 'laydate' , 'util'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,laydate = layui.laydate
+            ,form    = layui.form
+            ,util    = layui.util;
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'order/index'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                // {checkbox: true},
+                {field:'id', title: 'ID',width:70},
+                {field:'atv_id', title: '活动期数' , width:70},
+                {field:'order_code', title: '订单号' , width:220},
+                {field:'pay_type', title: '订单状态'  , width:110,templet: function(d){
+                        if(d.pay_type==0){
+                            return '<a class="layui-btn  layui-btn-danger layui-btn-xs">未付款</a>';
+                        }
+                        else if(d.pay_type==1){
+                            return '<a class="layui-btn layui-btn layui-btn-normal layui-btn-xs">已付款</a>';
+                        }else if(d.pay_type==2){
+                            return '<a class="layui-btn layui-btn layui-btn-warm layui-btn-xs">团长待收货</a>';
+                        }
+                        else if(d.pay_type == 3){
+                            return '<a class="layui-btn layui-btn layui-btn-warm layui-btn-xs">用户待提货</a>';
+                        }else if(d.pay_type == 4){
+                            return '<a class="layui-btn layui-btn layui-btn-normal layui-btn-xs">交易完成</a>';
+                        }else if(d.pay_type==-1){
+                            return '<a class="layui-btn layui-btn layui-btn-disabled layui-btn-xs">取消订单</a>';
+                        } else if(d.pay_type==5){
+                            return '<a class="layui-btn layui-btn layui-btn-disabled layui-btn-xs">退款中</a>';
+                        }
+                    }
+                },
+                {field:'uid', title: '微信名' , width:150,templet: '#showimg'},
+                {field:'wx', title: '收货人',templet:function (d) {
+                        return '<b>'+d.address_data.nickname+'</b>';
+                    }},
+                {field:'pay_price', title: '支付价',templet:function (d) {
+                        return '<b style="color: red">¥'+d.pay_price.toFixed(2)+'</b>';
+                    }},
+                {field:'profit_price', title: '利润',templet:function (d) {
+                        return '<b style="color: red">¥'+d.profit_price.toFixed(2)+'</b>';
+                    }},
+                {field:'fx_price', title: '佣金',templet:function (d) {
+                        return '<b style="color: red">¥'+d.fx_price.toFixed(2)+'</b>';
+
+                    }},
+                {field:'city', title: '等级团长佣金', width:100,templet: '#showimgs'},
+                {field:'city', title: '城市', width:80},
+                {field:'username', title: '团长', width:80},
+                {field:'print_status', title: '打印状态', width:100,templet: function(d){
+                        if(d.print_status==0)
+                            return '<a class="layui-btn  layui-bg-green layui-btn-xs">未打印</a>';
+                        else
+                            return '<a class="layui-btn layui-bg-black layui-btn-normal layui-btn-xs">已打印</a>';
+                    }},
+                {field:'create_time', title: '下单时间', width:150, templet:function (d) {
+                        return layui.laytpl.toDateString(d.create_time *1000)
+                    }},
+                {field:'pay_time', title: '支付时间', width:150, templet:function (d) {
+                        return layui.laytpl.toDateString(d.pay_time *1000)
+                    }},
+                {field:'delivery_time', title: '配送时间', width:150, templet:function (d) {
+                        return layui.laytpl.toDateString(d.delivery_time *1000)
+                    }},
+                {field:'send_time', title: '发货时间', width:150 , templet:function (d) {
+                        return layui.laytpl.toDateString(d.send_time *1000)
+                    }},
+                {field:'up_time', title: '签收时间', width:150, templet:function (d) {
+                        return layui.laytpl.toDateString(d.up_time *1000)
+                    }},
+                {field:'end_time', title: '核销时间' , width:150, templet:function (d) {
+                        return layui.laytpl.toDateString(d.end_time *1000)
+                    }},
+                {fixed: 'right', title:'操作', toolbar: '#rights', width:160}
+            ]]
+
+            ,done:function(res){
+                //添加发货节点ID
+                $('#send_orders').attr('data-count' , res.count);
+                //  若未配置云打印则无法让用户打印
+                if(res.msg == ''){
+                    $('#noticso').remove();
+                    $('#test-table-autowidth').before('<blockquote class="layui-elem-quote" id="noticso" style="color: red">您还未配置打印,将无法打印订单信息喔 ≥...≤!~ </blockquote>');
+                    var pris = $('a[data-printer="1"]');
+                    pris.removeClass('layui-btn-primary');
+                    pris.addClass('layui-btn-disabled');
+                    pris.attr('lay-event','');
+                    $('#printer_orders').remove();
+                }
+            }
+        });
+        form.render();
+        admin.req({
+            type:'POST',
+            url: config.url+'order/searchInit',//数据接口
+            done:function(res){
+                if(res.data){
+                    //团长
+                    var capselect = document.getElementById("captain");
+                    var captain   = res.data.captain;
+
+                    jsonInit(captain,capselect);
+                    // 城市
+                    var citselect = document.getElementById("city");
+                    var city = res.data.city;
+                    jsonInit(city,citselect);
+
+                    // 配送时间
+                    var atvslect = document.getElementById("atvs");
+                    var atvs = res.data.atvs;
+                    $.each(atvs,function(idx,obj){
+                        obobj = new Option('第'+ obj + '期' , obj);
+                        atvslect.options.add(obobj);
+
+                    });
+                    //配送时间段
+                    var citselect = document.getElementById("delivery_data");
+                    var delivery_data = res.data.delivery_data;
+                    jsonInit(delivery_data,citselect);
+
+                    form.render();
+                }
+            }
+        });
+        // 动态载入下拉选择
+        function jsonInit(objsons , object) {
+            $.each(objsons,function(idx,obj){
+                object.options.add(new Option(obj,idx));
+
+            });
+        }
+        //初始化json
+        var json = {};
+        form.on('select(aihao)', function(data){
+            var name = data.elem.name;
+            json.se = 1;
+            switch (name) {
+                case ("pay_type"):
+                    json.pay_type = data.value;
+                    break;
+                case ("captain"):
+                    json.cap_id = data.value;
+                    break;
+                case ("city"):
+                    json.cityid = data.value;
+                    break;
+                case ("atv_id"):
+                    json.atv_id = data.value;
+                    break;
+                case ("delivery_data"):
+                    json.delivery_data = data.value;
+                    break;
+            }
+
+            JSON.stringify(json);
+            //执行重载
+            tableIns.reload( {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                ,where: {
+                    json
+                }
+            });
+        });
+        // 下单时间搜索
+        laydate.render({
+            elem: '#create_end_time'
+            ,type: 'datetime'
+            ,range: '~'
+            // ,value: util.toDateString(new Date(), 'yyyy-MM-dd HH:mm:ss') + ' ~ ' + util.toDateString(new Date(), 'yyyy-MM-dd HH:mm:ss')
+            ,done: function(value, date){
+                json.se = 1;
+                json.c_e_time = value;
+                JSON.stringify(json);
+                //执行重载
+                tableIns.reload({
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        json
+                    }
+                });
+            }
+        });
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload').val();
+                var goods_name = $('#goods_name').val();
+                var nickname   = $('#nickname').val();
+
+                json.order_code = demoReload;
+                json.goods_name = goods_name;
+                json.nickname   = nickname;
+                JSON.stringify(json);
+                console.log(json)
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        json
+                    }
+                });
+            },
+            excel_order:function () {
+                var data = [];
+                data.pay_type        = $('.pay_type').val();
+                data.captain         = $('#captain').val();
+                data.nickname        = $('#nickname').val();
+                data.city            = $('#city').val();
+                data.delivery_data   = $('#delivery_data').val();
+                data.create_end_time = $('#create_end_time').val();
+                data.demoReload      = $('#demoReload').val();
+                data.goods_name      = $('#goods_name').val();
+                data.atv_id          = $('#atvs').val();
+                var url = config.url+'Excel/excel_order?a=1&pay_type='+data.pay_type+'&captain='+data.captain
+                    +'&city='+data.city+'&atvid='+data.atvs+'&create_end_time='+data.create_end_time+'&demoReload='+data.demoReload+'&delivery_data='+data.delivery_data+'&atv_id='+data.atv_id+'&nickname='+data.nickname+'&goods_name='+data.goods_name;
+                layer.confirm('若导出订单超过3000条，导出后请不要刷新，继续点击确定，将会导出剩余订单', function(index) {
+                     //window.open(url);
+                    window.location.href=url;
+                    }
+                )
+                // window.location.reload();
+            },
+            test:function () {
+
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('toolbar(test-table-autowidth)', function(obj) {
+            var count = $('#send_orders').data('count');
+            if (obj.event == 'allsend') {
+                layer.confirm('您确定要发所查的全部订单吗??', function(index){
+                    var data = [];
+                    data.pay_type        = $('.pay_type').val();
+                    data.captain         = $('#captain').val();
+                    data.city            = $('#city').val();
+                    data.delivery_data   = $('#delivery_data').val();
+                    data.create_end_time = $('#create_end_time').val();
+                    data.demoReload      = $('#demoReload').val();
+                    data.goods_name      = $('#goods_name').val();
+                    data.nickname        = $('#nickname').val();
+                    data.atv_id          = $('#atvs').val();
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                         data: {
+                            "pay_type"       : data.pay_type,
+                            "captain"        : data.captain ,
+                            "city"           : data.city ,
+                            "delivery_data"  : data.delivery_data ,
+                            "create_end_time": data.create_end_time ,
+                            "demoReload"     : data.demoReload ,
+                            "goods_name"     : data.goods_name ,
+                            "nickname"       : data.nickname ,
+                            "atv_id"         : data.atv_id ,
+                         },
+                        url: config.url + 'order/edit'//数据接口
+                        ,
+                        beforeSend: function () {
+                            layer.load(0, {
+                                offset: 'auto'
+                            });
+                            layer.close(index);
+                        },
+                        done: function (res) {
+                            if(res.data.code != true){
+                                var msg = '';
+                                    switch(res.data.msg){
+                                        case -5000:
+                                            msg = '有订单活动未结束,已经停止发货!';
+                                            break;
+                                        case -5051:
+                                            msg = '有订单状态有误,您已发货或用户未付款,已经停止发货';
+                                            break;
+                                        case -5052:
+                                            msg = '有订单未找到,为了保证您的账户安全,已经停止发货';
+                                            break;
+                                        case -5053:
+                                            msg = '有订单没有找到团长用户信息呢,已经停止发货!';
+                                            break;
+                                        case -5054:
+                                            msg = '核销码生成失败了呢,已停止发货!';
+                                            break;
+                                        case -5055:
+                                            msg = '订单状态修改失败了呢!';
+                                            break;
+                                        case -5056:
+                                            msg = '团长未清理订单,已停止发货!';
+                                            break;
+                                    }
+                                    layer.msg(msg, {
+                                        offset: '15px'
+                                        , icon: 2
+                                        , time: 2000
+                                        ,end:function () {
+                                            admin.events.refresh()
+                                        }
+                                    });
+                            }else{
+                                layer.msg('发货成功! ≥ ▽ ≤', {
+                                    offset: '15px'
+                                    , icon: 1
+                                    , time: 2000
+                                    ,end:function () {
+                                        admin.events.refresh()
+                                    }
+                                });
+                            }
+
+                        }
+                    });
+                });
+            }else if (obj.event == 'allprinter') {
+                layer.confirm('您确定要打印所查的全部订单吗??', function(index){
+                    //掉删除接口
+                    var data = [];
+                    data.pay_type        = $('.pay_type').val();
+                    data.captain         = $('#captain').val();
+                    data.city            = $('#city').val();
+                    data.delivery_data   = $('#delivery_data').val();
+                    data.create_end_time = $('#create_end_time').val();
+                    data.demoReload      = $('#demoReload').val();
+                    data.goods_name      = $('#goods_name').val();
+                    data.nickname        = $('#nickname').val();
+                    data.atv_id          = $('#atvs').val();
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'order/printer'//数据接口
+                        , data: {
+                            "id"             : '',
+                            "printer"        : 1,
+                            "pay_type"       : data.pay_type,
+                            "captain"        : data.captain ,
+                            "city"           : data.city ,
+                            "delivery_data"  : data.delivery_data ,
+                            "create_end_time": data.create_end_time ,
+                            "demoReload"     : data.demoReload ,
+                            "goods_name"     : data.goods_name ,
+                            "nickname"       : data.nickname ,
+                            "atv_id"         : data.atv_id ,
+                        },
+                        beforeSend: function () {
+                            layer.load(0, {
+                                offset: 'auto'
+                            });
+                            layer.close(index);
+                        },
+                        done: function (res) {
+                            if(res.data.code != true){
+                                var msg = '';
+                                switch(res.data.msg){
+                                    case -1:
+                                        msg = '打印配置有误:接口名称错误';
+                                        break;
+                                    case -2:
+                                        msg = '打印配置有误:该帐号未注册';
+                                        break;
+                                    case -3:
+                                        msg = '打印配置有误:签名错误';
+                                        break;
+                                    case 1001:
+                                        msg = '打印配置有误:打印机编号不合法';
+                                        break;
+                                }
+                                layer.msg(msg, {
+                                    offset: '15px'
+                                    , icon: 2
+                                    , time: 2000
+                                    ,end:function () {
+                                        admin.events.refresh()
+                                    }
+                                });
+                            }else{
+                                layer.msg('打印成功! ≥ ▽ ≤', {
+                                    offset: '15px'
+                                    , icon: 1
+                                    , time: 2000
+                                    ,end:function () {
+                                        admin.events.refresh()
+                                    }
+                                });
+                            }
+
+                        }
+                    });
+                });
+            }
+        });
+        table.on('tool(test-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'printer'){
+                layer.open({
+                    type: 2
+                    ,title: '查看' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['790px', '700px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'LAY_printer' //设定一个id，防止重复弹出
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.html_url + 'order/printer/id=' + data.id
+                });
+            }else if(obj.event === 'detail') {
+                layer.open({
+                    type: 2
+                    ,title: '查看' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['700px', '700px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.html_url + 'order/detail/id=' + data.id
+                });
+            }else if(obj.event === 'detail_fx') {
+                layer.open({
+                    type: 2
+                    ,title: '查看' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['700px', '700px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.html_url + 'order/detail_fx/id=' + data.id
+
+                });
+            }
+        });
+        //监听工具条
+
+
+    });
+</script>

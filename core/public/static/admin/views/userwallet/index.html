@@ -1,0 +1,224 @@
+
+<title>提现管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>提现管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">提现管理</div>
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-bottom: 10px;">
+                        搜索：
+                        <div class="layui-inline">
+                            <input class="layui-input" name="search" placeholder="搜索团长姓名" id="demoReload" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+                    </div>
+                    <table class="layui-hide" id="test-table-autowidth-userwall" lay-filter="test-table-autowidth-userwall"> </table>
+                    <script type="text/html" id="switchTpl">
+                        <input type="checkbox" name="status"  value="{{d.id}}" lay-skin="switch" lay-text="已打款|未打款" lay-filter="walstatus" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                    <script type="text/html" id="cash">
+
+                        {{ (d.status!=1) ? '<a class="layui-btn layui-btn-primary layui-btn-xs" data-printer="1"  lay-event="cash"><i class="layui-icon layui-icon-note"></i>微信打款</a>' : '' }}
+                    </script>
+                    <script type="text/html" id="showimg">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" title="查看订单流水" data-type="{{ d.wall_user_data.username }}"  lay-event="detail" ><i class="layui-icon">&#xe66f;</i>{{ d.wall_user_data.username }}</a>
+                    </script>
+                    <!--<script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="2"  lay-event="checkok">
+                                <i class="layui-icon">&#xe640;</i>删除
+                            </button>
+                        </div>
+                    </script>-->
+                    <!--<script type="text/html" id="rights">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs"  lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+                    </script>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,form = layui.form;
+
+        var tableIns = table.render({
+            elem: '#test-table-autowidth-userwall'
+            ,url: config.url+'userwallet/index'//数据接口
+            // ,toolbar: '#toolbar'
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                // {checkbox: true},
+                // {field:'id', title: 'ID',width:50},
+                {field:'username', title: '团长姓名' ,  templet: '#showimg'},
+                {field:'bank', title: '账号' , templet:function (d) {
+                    if(d.wall_user_data.bank_type==0){
+
+                        return d.wall_user_data.tenpay;
+
+                    }else if(d.wall_user_data.bank_type==1){
+
+                        return d.wall_user_data.alipay;
+
+                    }else {
+                        return d.wall_user_data.bank;
+                    }
+                }},
+                {field:'bank', title: '转账方式' , templet:function (d) {
+                        if(d.wall_user_data.bank_type==0){
+                            return '微信';
+                        }else if(d.wall_user_data.bank_type==1){
+                            return '支付宝';
+                        }else {
+                            if(d.wall_user_data.bank_name){
+                                return d.wall_user_data.bank_name;
+                            }else {
+                                return '';
+                            }
+                        }
+                    }},
+
+                {field:'bank_username', title: '账户人名称' ,templet:function (d) {
+                        return d.wall_user_data.bank_username;
+                    }},
+                {field:'mobile', title: '联系电话' , templet:function (d) {
+                    return d.wall_user_data.mobile;
+                }},
+                {field:'', title: '实际提现金额' ,templet:function (d) {
+                        return '<b style="color: red">¥'+d.wall_data.diff+'</b>';
+                    }},
+                {field:'wall_fee', title: '提现金额',  templet:function (d) {
+                        return '<b style="color: red">¥'+d.wall_fee+'</b>';
+                    }},
+                {field:'create_time', title: '申请时间',  templet:function (d) {
+                        return layui.laytpl.toDateString(d.create_time *1000)
+                    }},
+                {field:'status', title: '线下打款'
+                    ,templet:  '#switchTpl', unresize: true
+                },
+                {field:'cash', title: '在线转账（微信）'
+                    ,toolbar:  '#cash', unresize: true
+                }
+            ]]
+        });
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        search: demoReload.val()
+                    }
+                });
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        table.on('tool(test-table-autowidth-userwall)', function(obj){
+            var data = obj.data; //得到所在行所有键值
+            if(obj.event === 'detail') {
+                layer.open({
+                    type: 2
+                    , title: '<b style="color: red">' +data.wall_user_data.username + '</b>' + '订单流水记录' //不显示标题栏
+                    , closeBtn: false
+                    , area: ['960px', '600px']
+                    , shade: 0.8
+                    , shadeClose: true
+                    , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    , btnAlign: 'c'
+                    , moveType: 1 //拖拽模式，0或者1
+                    , content: config.html_url + 'userwallet/detail/id='+data.id
+                });
+            }else if(obj.event === 'cash'){
+                var data = obj.data;
+                layer.confirm('您确定要直接提现到团长绑定的微信零钱吗??', function(index){
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'userwallet/cash'//数据接口
+                        ,
+                        data: {
+                            "id": data.id,
+                            "status": 1,
+                        },
+                        done: function (res) {
+                            if(res.data.return_code == 'SUCCESS'&&res.data.result_code == 'SUCCESS'){
+                                layer.msg('您的提现已成功，请稍后与团长核对是否到账', {
+                                    offset: 'auto'
+                                    , icon: 1
+                                    , time: 1000,
+                                    end:function () {
+                                        location.reload()
+                                    }
+                                });
+                                return false;
+                            }else {
+                                layer.msg(res.data.return_msg+','+res.data.err_code_des, {
+                                    offset: 'auto'
+                                    , icon: 2
+                                    , time: 4000
+                                });
+                                return false;
+                            }
+
+                        }
+                    });
+                });
+
+            }
+        });
+
+        form.on('switch(walstatus)', function(obj) {
+            if (obj.elem.checked == false){
+                layer.msg('已经审核过了呢! ≥ ▽ ≤', {
+                    offset: 'auto'
+                    , icon: 2
+                    , time: 1000,
+                    end:function () {
+                        location.reload()
+                    }
+                });
+                return false;
+            }
+            admin.req({
+                type: 'POST',
+                url: config.url + 'userwallet/edit'//数据接口
+                , data: {
+                    "id": obj.value,
+                    "status": 1,
+                },
+                done: function (res) {
+                    layer.msg('操作成功! ≥ ▽ ≤', {
+                        offset: 'auto'
+                        , icon: 1
+                    })
+                }
+            });
+        });
+
+    });
+</script>

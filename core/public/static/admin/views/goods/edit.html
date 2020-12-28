@@ -1,0 +1,571 @@
+<button class="layui-btn layui-btn-normal layui-btn-sm" style="position: fixed;
+    z-index: 9999;
+        margin-left: 14px; margin-top: 2px;
+    background-color: #1e9fff9e;" onclick="javascript:history.back(-1);"><i class="layui-icon"></i>返回上一级</button>
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">添加商品</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-form-edit">
+        <div class="layui-form-item">
+          <label class="layui-form-label">商品名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="goods_name" lay-verify="required|lengthnow" autocomplete="off" placeholder="请输入商品名称" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">商品副标题</label>
+          <div class="layui-input-block">
+            <input type="text" name="re_name" lay-verify="required|lengthnow" autocomplete="off" placeholder="商品副标题" class="layui-input">
+          </div>
+        </div>
+
+        <br>
+        <div class="layui-form-item">
+          <label class="layui-form-label">分类</label>
+          <div class="layui-input-inline">
+            <select name="cat_id" xm-select="get_goods_cat" lay-verify="required" xm-select-radio xm-select-search="">
+              <option value="0" disabled="disabled"></option>
+            </select>
+          </div>
+          <label class="layui-form-label">规格</label>
+          <div class="layui-input-inline">
+            <input type="text" name="norms" lay-verify="required" autocomplete="off" placeholder="请输入商品规格" class="layui-input">
+          </div>
+          <label class="layui-form-label">库存</label>
+          <div class="layui-input-inline">
+            <input type="text" name="stock" lay-verify="required|number" autocomplete="off" placeholder="请输入商品库存" class="layui-input">
+          </div>
+        </div>
+
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">活动价</label>
+          <div class="layui-input-inline">
+            <input type="text" name="price" lay-verify="required|number" autocomplete="off" placeholder="请输入商品活动价" class="layui-input">
+          </div>
+          <label class="layui-form-label">成本价</label>
+          <div class="layui-input-inline">
+            <input type="text" name="cost_price" lay-verify="required|number" autocomplete="off" placeholder="请输入商品成本价" class="layui-input">
+          </div>
+          <label class="layui-form-label">原价</label>
+          <div class="layui-input-inline">
+            <input type="text" name="init_price" lay-verify="required|number" autocomplete="off" placeholder="请输入商品原价" class="layui-input">
+          </div>
+
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">秒杀价</label>
+          <div class="layui-input-inline">
+            <input type="text" name="spike_price" lay-verify="required|number" autocomplete="off" placeholder="请输入商品秒杀价格" class="layui-input">
+          </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <!--          <label class="layui-form-label">多规格</label>-->
+            <!--          <div class="layui-input-inline">-->
+            <!--            <select name="much_norms" xm-select="select_norms"  xm-select-search="">-->
+            <!--            </select>-->
+            <!--          </div>-->
+          <label class="layui-form-label">多规格</label>
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm aaa">
+              <i class="layui-icon">&#xe608;</i>
+            </button>
+
+        </div>
+        <div class="dd">
+
+        </div>
+
+        <div class="layui-form-item" style="margin-bottom: 2rem">
+
+
+
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">供应商</label>
+          <div class="layui-input-inline">
+            <select name="sup_id" xm-select="select-supplier"  lay-verify="required" xm-select-radio xm-select-search="" >
+              <option value="0" disabled="disabled"></option>
+            </select>
+          </div>
+          <label class="layui-form-label">所属城市</label>
+          <div class="layui-input-inline">
+            <select name="cityid" xm-select="select8" lay-verify="required" xm-select-search="">
+            </select>
+          </div>
+          <label class="layui-form-label">商品标签</label>
+          <div class="layui-input-inline">
+            <select name="goods_icon" xm-select="select-goods-icon"  xm-select-radio xm-select-search="">
+              <option value="0" disabled="disabled"></option>
+            </select>
+          </div>
+        </div>
+        <br>
+
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">营销</label>
+          <div class="layui-input-block">
+            <input type="checkbox" name="type[0][0]" value="1" title="限购" lay-filter="limitation">
+            <!--<input type="checkbox" name="type[1][0]" value="1" title="满减" >-->
+            <input type="checkbox" name="new_mj" value="1" title="满减" >
+          </div>
+        </div>
+        <div class="layui-form-item" id="limitation-show">
+          <label class="layui-form-label"></label>
+          <div class="layui-input-inline">
+            <input type="text"   autocomplete="off" placeholder="请输入限购数量" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">团长佣金比</label>
+          <div class="layui-input-inline">
+            <input type="text" name="fx_ratio" lay-verify="required|number" autocomplete="off" placeholder="请输入商品分销比例" class="layui-input">
+          </div>
+          <span style="    font-size: 20px;
+    font-weight: 400;
+    line-height: 38px;
+    text-align: right;">%</span>
+          <!--<blockquote style="margin-left: 110px;margin-top: 2px; color: red;" class="layui-elem-quote">* 亲.注意注意!!!：百分比(1 => 1%)</blockquote>-->
+        </div>
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">排序值</label>
+          <div class="layui-input-inline">
+            <input type="text" name="sort" lay-verify="required" autocomplete="off" placeholder="请输入商品排序值" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" >
+          <label class="layui-form-label">可用积分</label>
+          <div class="layui-input-inline">
+            <input type="text" name="max_integral"  autocomplete="off"  class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" >
+          <label class="layui-form-label">返送积分</label>
+          <div class="layui-input-inline">
+            <input type="text" name="re_integral"  autocomplete="off"  class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">虚拟销量</label>
+          <div class="layui-input-inline" style="width:70px">
+            <input type="checkbox" name="virtual_status" value="1" lay-skin="switch" lay-text="开启|关闭" lay-filter="virtual">
+          </div>
+          <label class="layui-form-label">商品状态</label>
+          <div class="layui-input-inline">
+            <input type="checkbox" name="status" value="1"  lay-skin="switch" lay-text="开启|关闭">
+          </div>
+        </div>
+
+        <div class="layui-form-item" id="virtual-show">
+          <label class="layui-form-label">虚拟销量</label>
+          <div class="layui-input-inline">
+            <input type="text" name="virtual"  autocomplete="off" placeholder="请输入商品虚拟销量" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">虚拟商品</label>
+          <div class="layui-input-inline" style="width:70px">
+            <input type="checkbox" name="virtual_goods" value="1" lay-skin="switch" lay-text="开启|关闭" lay-filter="virtual_goods">
+          </div>
+          <label class="layui-form-label">今日推荐</label>
+          <div class="layui-input-inline">
+            <input type="checkbox" name="recommend" value="1"  lay-skin="switch" lay-text="开启|关闭">
+          </div>
+        </div>
+        <div class="layui-form-item virtual_goods" id="virtual_goods">
+          <label class="layui-form-label">核销码</label>
+          <div class="layui-input-inline">
+            <input type="text" name="virtual_code"  autocomplete="off" placeholder="虚拟商品核销密码（限六位）" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item virtual_goods" id="virtual_time">
+          <label class="layui-form-label">过期时间</label>
+          <div class="layui-input-inline">
+            <input type="text" name="virtual_time"  autocomplete="off" placeholder="过期时间（天）" class="layui-input">
+          </div>
+        </div>
+        <br>
+        <div class="layui-form-item">
+          <label class="layui-form-label">封面图</label>
+          <div class="layui-upload">
+            <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button>
+            <div class="layui-upload-list del-image"  id="test-upload-normal-img"><ul></ul></div>
+            <blockquote style="margin-left: 110px" class="layui-elem-quote">商品封面图尺寸200*200px 最多只能上传1.2M之内的图片</blockquote>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">滚动图</label>
+          <div class="layui-upload">
+            <button type="button" class="layui-btn" id="test-upload-normal2">多图片上传</button>
+            <div class="layui-upload-list del-image"  id="test-upload-normal-img2"><ul></ul></div>
+            <blockquote style="margin-left: 110px" class="layui-elem-quote">商品轮播图750*750px 最多只能上传1.2M之内的图片</blockquote>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">商品介绍</label>
+          <div class="layui-input-block">
+            <textarea name="goods_content" lay-verify="content" id="goods_content" style="display: none;"></textarea>
+          </div>
+          <blockquote style="margin-left: 110px" class="layui-elem-quote">商品介绍图宽750px，高度不限制 上传大小建议:1.2M以内</blockquote>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-form-edit-submit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+    layui.use(['admin','layer','upload', 'form' , 'layedit' , 'formSelects'], function() {
+        var $            = layui.$
+            ,admin       = layui.admin
+            , upload     = layui.upload
+            ,layer       = layui.layer
+            ,layedit     = layui.layedit
+            ,formSelects = layui.formSelects
+            ,form        = layui.form;
+
+        var router = layui.router();
+        var id = router.search.id;
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+      var is = 0
+        form.verify({
+            lengthnow: function(value){
+                if(value.length > 20){
+                    return '商品至多只能是20字呀! ≥...≤!~';
+                }
+            }
+        });
+        index = layedit.build('goods_content',{
+            height:300,
+            uploadImage:{url: config.url+'base_admin/upload', type: 'post'}
+        }); //建立编辑器
+        //发送请求获取数据(数据的回显)
+        admin.req({
+            type:'POST',
+            url: config.url+'goods/edit'//数据接口
+            ,data:{"id":id},
+            done:function(res){
+                if(res.data){
+                    //预设元素
+
+                    form.val("goods-form-edit", {
+                        "type[0][0]": (res.data.tag != '') ? 1 : 0,
+                        "type[1][0]": (res.data.tag2 != '') ? 1 : 0,
+                        "new_mj"    : (res.data.new_mj)?1:0,
+                        "goods_name": res.data.goods_name,
+                        "cost_price": res.data.cost_price,
+                        "init_price": res.data.init_price,
+                        "max_integral": res.data.max_integral,
+                        "re_integral": res.data.re_integral,
+                        "price": res.data.price,
+                        "spike_price": res.data.spike_price,
+                        "fx_ratio": res.data.fx_ratio,
+                        "stock": res.data.stock,
+                        "norms": res.data.norms,
+                        "delivery_time": res.data.delivery_time,
+                        "virtual_status": (res.data.virtual_status) ? 1 : 0,
+                        "virtual_goods": (res.data.virtual_goods) ? 1 : 0,
+                        "virtual": res.data.virtual,
+                        "virtual_code": res.data.virtual_code,
+                        "virtual_time": res.data.virtual_time,
+                        "recommend": (res.data.recommend) ? 1 : 0,
+                        "status": (res.data.status) ? 0 : 1,
+                        "sort": res.data.sort,
+                        "re_name": res.data.re_name,
+                    });
+                    if(res.data.virtual_status == 1){
+                        $('#virtual-show').show();
+                        $('#virtual-show input').attr({'lay-verify' : 'required|number'});
+                    }else{
+                        $('#virtual-show input').val('');
+                    }
+                    if(res.data.virtual_goods == 1){
+                      $('.virtual_goods').show();
+                      $('.virtual_goods input').attr({'lay-verify' : 'required|number'});
+                    }else{
+                      $('.virtual_goods input').val('');
+                    }
+
+                    if(res.data.ispro == 0){
+                        $('input[name="type[1][0]"]').next('div').children('i').remove();
+                        $('input[name="type[1][0]"]').next('div').addClass('layui-checkbox-disbaled layui-disabled');
+                        $('input[name="type[1][0]"]').next('div').children('span').html('满减已关闭');
+                        $('input[name="type[1][0]"]').remove();
+                    }
+                    if(res.data.goods_headimage != ''){
+                        var str = '<dd><i class="layui-icon" >&#x1007;</i> <img  width="100px" src="'+res.data.goods_headimage+'"> <p id="test-upload-demoText"></p><input type="hidden" name="goods_image" value="'+res.data.goods_headimage+'"></dd>';
+                        $('#test-upload-normal-img ul').append(str);
+                    }
+                    var strs = '';
+                    if(res.data.goods_headimages != ''){
+                        layui.each(res.data.goods_headimages, function(index, item){
+                            strs += '<dd><i class="layui-icon">&#x1007;</i> <img  width="100px" src="'+item+'"> <p id="test-upload-demoText"></p><input type="hidden" name="goods_images[]" value="'+item+'" class="objgoods_images"></dd>';
+                        })
+                        $('#test-upload-normal-img2 ul').append(strs);
+                    }
+
+                    if(res.data.tag != ''){
+                        $('#limitation-show').show();
+                        $('#limitation-show input').val(res.data.tag.discounts);
+                    }
+                    //添加限购初始标签值
+                    $('#limitation-show input').attr('name','type[0][1]');
+                    layedit.setContent(index,res.data.goods_content);
+
+                    formSelects.data('select8', 'server', {
+                      type: "post",
+                        url: config.url+'cities/selectlistAll',
+                        keyword: '',
+                       data:{gid:res.data.id},
+                    });
+                    formSelects.data('select_norms', 'server', {
+                      type: "post",
+                      url: config.url+'goods/muchNorms',
+                      keyword: '',
+                      data:{gid:res.data.id},
+                    });
+                    formSelects.data('cap_id-select', 'server', {
+                      type: "post",
+                        url: config.url+'captain/initselectlistAll',
+                        keyword: '',
+                        data:{gid:res.data.id},
+                    });
+                     formSelects.data('select-goods-icon', 'server', {
+                       type: "post",
+                       url: config.url+'goods/getgoodsIcon',
+                       data:{gid:res.data.id},
+                       keyword: '',
+                     });
+
+                  // formSelects.data('get_goods_cat', 'server', {
+                  //   url: config.url+'goods_cat/getcat&gid='+res.data.id,
+                  //   keyword: '',
+                  // });
+                  formSelects.data('get_goods_cat', 'server', {
+                    type: "post",
+                    url: config.url+'goods_cat/getcat',
+                    data:{gid:res.data.id},
+                    keyword: '',
+                  });
+                    formSelects.data('select-supplier', 'server', {
+                        type: "post",
+                        url: config.url+'supplier/selectlistAll',
+                        data:{gid:res.data.id},
+                        keyword: '',
+                    });
+
+                    if(res.data.m_norms){
+                      var counts = res.data.m_norms.length;
+                      for (var i=0;i<counts;i++){
+                        is++
+                        var html = '<div class="layui-form-item as">'+
+                                '<label class="layui-form-label">'+'多规格'+'</label>'+
+                                '<div class="layui-input-inline">'+
+                                '<input type="text" name="no['+is+'][norms]" lay-verify="required" value="'+res.data.m_norms[i].norms+'" autocomplete="off" placeholder="请输入规格" class="layui-input">'+
+                                '</div>'+
+                                '<label class="layui-form-label">'+'价格'+'</label>'+
+                                '<div class="layui-input-inline">'+
+                                '<input type="text" name="no['+is+'][price]" lay-verify="required|number" value="'+res.data.m_norms[i].price+'" autocomplete="off" placeholder="请输入规格价格" class="layui-input">'+
+                                '</div>'+
+                                '<label class="layui-form-label">'+'库存'+'</label>'+
+                                '<div class="layui-input-inline">'+
+                                '<input type="text" name="no['+is+'][stock]" lay-verify="required|number" value="'+res.data.m_norms[i].stock+'" autocomplete="off" placeholder="请输入规格库存" class="layui-input">'+
+                                '<input type="text" name="no['+is+'][id]" style="display: none"   lay-verify="required|number" value="'+res.data.m_norms[i].id+'" autocomplete="off" placeholder="请输入规格库存" class="layui-input">'+
+                                '</div>'+
+                                '<button type="button" class="layui-btn layui-btn-primary layui-btn-sm b_del">'+
+                                '<i class="layui-icon">&#xe640;</i>'+
+                                '</button>'+
+                                '</div>';
+                        $('.dd').append(html);
+                      }
+                    }
+                }
+            }
+        });
+
+
+      $(document).on('click','.b_del',function(){
+        $(this).parent().hide();
+        $(this).parent().find('input').removeAttr('name');
+        $(this).parent().find('input').removeAttr('lay-verify');
+
+      });
+
+      $('.aaa').click(function () {
+        is++;
+        var html = '<div class="layui-form-item as">'+
+                '<label class="layui-form-label">'+'多规格'+'</label>'+
+                '<div class="layui-input-inline">'+
+                '<input type="text" name="no['+is+'][norms]" lay-verify="required" autocomplete="off" placeholder="请输入规格" class="layui-input">'+
+                '</div>'+
+                '<label class="layui-form-label">'+'价格'+'</label>'+
+                '<div class="layui-input-inline">'+
+                '<input type="text" name="no['+is+'][price]" lay-verify="required|number" autocomplete="off" placeholder="请输入规格价格" class="layui-input">'+
+                '</div>'+
+                '<label class="layui-form-label">'+'库存'+'</label>'+
+                '<div class="layui-input-inline">'+
+                '<input type="text" name="no['+is+'][stock]" lay-verify="required|number" autocomplete="off" placeholder="请输入规格库存" class="layui-input">'+
+                '</div>'+
+                '<button type="button" class="layui-btn layui-btn-primary layui-btn-sm b_del">'+
+                '<i class="layui-icon">&#xe640;</i>'+
+                '</button>'+
+                '</div>';
+        $('.dd').append(html);
+      })
+
+
+        formSelects.btns('cap_id-select', [ 'remove']);
+        formSelects.btns('select8', []);
+        // formSelects.render();
+        layui.use('form', function() {
+            form.render();
+        });
+        $('.del-image').on('click','.layui-icon', function () {
+            $(this).parents('dd').remove();
+        });
+        /*
+        *  限购显示
+        * */
+        $('#limitation-show').hide();
+        form.on('checkbox(limitation)', function(data){
+            if(data.elem.checked){
+                $('#limitation-show').show();
+                $('#limitation-show input').attr({'name' : 'type[0][1]' , 'lay-verify' : 'required|number'});
+            }
+            else{
+                $('#limitation-show').hide();
+                $('#limitation-show input').removeAttr('name');
+                $('#limitation-show input').removeAttr('lay-verify');
+            }
+        });
+
+      $('.virtual_goods').hide();
+      form.on('switch(virtual_goods)', function(data){
+        if(data.elem.checked){
+          $('.virtual_goods').show();
+          $('#virtual_goods input').attr({'name':'virtual_code' , 'lay-verify' : 'required|number'});
+          $('#virtual_time input').attr({'name':'virtual_time' , 'lay-verify' : 'required|number'});
+        } else{
+          $('.virtual_goods').hide();
+          $('.virtual_goods input').removeAttr('name');
+          $('.virtual_goods input').removeAttr('lay-verify');
+        }
+      });
+        /*
+        *  虚拟销量显示
+        * */
+        $('#virtual-show').hide();
+        form.on('switch(virtual)', function(data){
+            if(data.elem.checked){
+                $('#virtual-show').show();
+                $('#virtual-show input').attr({'name':'virtual' , 'lay-verify' : 'required|number'});
+            }
+            else{
+                $('#virtual-show').hide();
+                $('#virtual-show input').removeAttr('name');
+                $('#virtual-show input').removeAttr('lay-verify');
+            }
+        });
+        /* 监听提交 */
+        form.on('submit(goods-form-edit-submit)', function(data){
+            if($('input[name="goods_image"]').length ==0){
+                layer.msg('封面图必须上传!',{icon:2});
+
+                return false;
+            }
+            if($('.objgoods_images').length == 0){
+                layer.msg('滚动图必须上传!',{icon:2});
+                return false;
+            }
+            data.field.id = id;
+            // console.log(data)
+            $.post(config.url+'goods/edit',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.alert('修改成功! ≥ ▽ ≤', function(index){
+                            window.location.href =config.html_url+'goods/index';
+                        });
+                    }else{
+                        layer.alert(res.data);
+                    }
+                });
+            return false;
+        });
+        /* 自定义验证规则 */
+        form.verify({
+            content: function(value) {//验证富文本编辑器
+                return layedit.sync(index);
+            },
+        });
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test-upload-normal'
+            ,url: config.url+'base_admin/upload'
+            ,data:{"type":"picture"}
+            ,multiple: true
+            ,size: 1700 //限制文件大小，单位 KB
+            ,before: function(obj){
+                layer.load(0, {
+                    offset: 'auto'
+                });
+            }
+            ,done: function(res){
+                //上传完毕
+            // console.log(res)
+
+            if (res.code > 0) {
+                    return layer.msg('上传失败');
+                }
+                $('#test-upload-normal-img ul').empty();
+                var str = '<dd><i class="layui-icon">&#x1007;</i> <img  width="100px" src="'+res.data.src+'"> <p id="test-upload-demoText1"></p><input type="hidden" name="goods_image" value="'+res.data.id+'" id="cover_value"></dd>';
+                $('#test-upload-normal-img ul').append(str)
+                layer.closeAll();
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#test-upload-demoText1');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        // console.log(config.url+'base_admin/upload');
+        //多图片上传
+        upload.render({
+            elem: '#test-upload-normal2'
+            ,url: config.url+'base_admin/upload'
+            ,data:{"type":"picture"}
+            ,size: 1700 //限制文件大小，单位 KB
+            ,multiple: true
+            ,before: function(obj){
+                layer.load(0, {
+                    offset: 'auto'
+                });
+            }
+            ,done: function(res){
+                //上传完毕
+                if (res.code > 0) {
+                    return layer.msg('上传失败');
+                }
+                var str = '<dd><i class="layui-icon">&#x1007;</i> <img  width="100px" src="'+res.data.src+'"> <p id="test-upload-demoText2"></p><input type="hidden" name="goods_images[]" value="'+res.data.id+'" class="objgoods_images"></dd>';
+                $('#test-upload-normal-img2 ul').append(str)
+                layer.closeAll();
+            }
+        });
+    });
+</script>
+

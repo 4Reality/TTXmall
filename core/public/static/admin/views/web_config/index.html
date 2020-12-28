@@ -1,0 +1,787 @@
+<style>
+    .sel-bottomnav{
+        border-radius: 10px;
+        margin-left: 3px;
+        margin-top: 3px;
+        cursor: pointer;
+    }
+    .sel-bottomnav-div{
+        width: 366px;
+        border: 1px solid #f5f4f4;
+        border-radius: 4px;
+        /*height: 150px;*/
+    }
+    .sel-bottomnav-div i{
+        left: 355px;
+        top: 36px;
+        border-radius: 4px;
+        width: 20px;
+        background: rgb(0, 150, 136);
+        font-size: 20px;
+        color: #fff;
+        line-height: 21px;
+        height: 20px;
+        display: none;
+        position: absolute;
+    }
+
+    .sel-ustcolor-div{
+        width: 206px;
+        border: 1px solid #f5f4f4;
+        border-radius: 4px;
+    }
+    .sel-ustcolor{
+        border-radius: 10px;
+        margin-left: 3px;
+        margin-top: 3px;
+        cursor: pointer;
+    }
+    .sel-ustcolor-div i{
+        left: 198px;
+        z-index: 999;
+        top: 330px;
+        border-radius: 4px;
+        width: 20px;
+        background: rgb(0, 150, 136);
+        font-size: 20px;
+        color: #fff;
+        line-height: 21px;
+        height: 20px;
+        display: none;
+        position: absolute;
+    }
+    #color-site label{
+        width: 100px;
+    }
+    #color-site .layui-input-block{
+        margin-left: 127px;
+    }
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容配置</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">内容配置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <!--标题-->
+                    <li class="layui-this">幻灯片管理</li>
+                    <li>版权配置</li>
+                    <li>团长申请介绍页</li>
+                    <li>供应商申请介绍页</li>
+                    <li>隐私政策</li>
+                    <li>授权页</li>
+                    <li>颜色配置</li>
+                    <li>清理垃圾</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <!--  幻灯片管理 -->
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-form-item">
+                            <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"></table>
+                            <script type="text/html" id="toolbar">
+                                <div class="layui-btn-container">
+                                    <button class="layui-btn" data-type="1"  lay-event="addcheckok">
+                                        <i class="layui-icon">&#xe654;</i>添加
+                                    </button>
+                                    <button class="layui-btn" data-type="2"  lay-event="checkok">
+                                        <i class="layui-icon">&#xe640;</i>删除
+                                    </button>
+                                </div>
+                            </script>
+
+                            <script type="text/html" id="rights">
+                                <a class="layui-btn layui-btn-primary layui-btn-xs"  lay-event="edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+                                <a class="layui-btn layui-btn-primary layui-btn-xs"  lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+                            </script>
+                        </div>
+                    </div>
+                    <!--版权配置-->
+                    <div class="layui-tab-item">
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="wechatconfig-form">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">版权内容</label>
+                                <div class="layui-input-block" >
+                                    <input type="radio" name="cright" value="0" lay-filter="cright" title="图片">
+                                    <input type="radio" name="cright" value="1" lay-filter="cright" title="文字">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">版权信息</label>
+                                <div class="layui-input-block" id="cright-content">
+                                    <div class="layui-upload" style="display: none">
+                                        <button type="button" class="layui-btn" id="cright-upload-normal">上传图片</button>
+                                        <div class="layui-upload-list del-image"  id="cright-upload-normal-img"></div>
+                                        <blockquote  class="layui-elem-quote">版权图片建议上传高度为50px的图片</blockquote>
+                                    </div>
+                                    <!-- <input  style="display: none" type="text" name="wechat_config[copyright]"   placeholder="" autocomplete="off" class="layui-input">-->
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">链接</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="copyright_link" placeholder="" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="wechatconfig-form-submit">立即提交</button>
+                                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!--内容配置内容-->
+                    <div class="layui-tab-item">
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="webconfig-form">
+                            <div class="layui-form-item">
+                                <blockquote  class="layui-elem-quote">背景图宽750px，高度不限 上传大小建议:1M以内</blockquote>
+                                <div>
+                                    <textarea name="captain" lay-verify="captain" id="captain" style="display: none;"></textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="webconfig-form-edit">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!--上传配置内容-->
+                    <div class="layui-tab-item ">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="webconfig-form">
+                            <div class="layui-form-item">
+                                <div>
+                                    <blockquote  class="layui-elem-quote">背景图宽750px，高度不限 上传大小建议:1M以内</blockquote>
+                                    <textarea name="supplier" lay-verify="supplier" id="supplier" style="display: none;"></textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="webconfig-form-edit">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="webconfig-form">
+                            <div class="layui-form-item">
+                                <div>
+                                    <blockquote  class="layui-elem-quote">背景图宽750px，高度不限 上传大小建议:1M以内</blockquote>
+                                    <textarea name="privacy" lay-verify="privacy" id="privacy" style="display: none;"></textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="webconfig-form-edit">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="layui-tab-item">
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="webconfig-form">
+                            <div class="layui-form-item">
+                                <div>
+                                    <blockquote  class="layui-elem-quote">背景图宽750px，高度不限 上传大小建议:1M以内</blockquote>
+                                    <textarea name="accredited" lay-verify="accredited" id="accredited" style="display: none;"></textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="webconfig-form-edit">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!--颜色配置-->
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <div class="layui-field-box">
+                                <div style="margin-left: 30px;" id="color-site">
+                                    <form class="layui-form" action="" onsubmit=" return  false" lay-filter="webconfig-form-fons">
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">背景颜色：</label>
+                                            <div class="layui-input-inline" style="width: 120px;">
+                                                <input type="text" name="app_bg_color" lay-verify="required" placeholder="请选择颜色" class="layui-input" id="app-color-form-input">
+                                            </div>
+                                            <div class="layui-inline" style="left: -11px;">
+                                                <div id="app-color-site"></div>
+                                            </div>
+                                            <div class="layui-inline" style="left: -11px;">
+                                                <button class="layui-btn layui-btn-normal" id="refresh-color"> <i class="layui-icon">&#xe9aa;</i>还原颜色</button>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">个人中心配色：</label>
+                                            <div class="layui-input-inline">
+                                                <div class="sel-ustcolor-div" data-alt="1">
+                                                    <i class="layui-icon">&#xe605;</i>
+                                                    <img src="" width="200px" class="sel-ustcolor">
+                                                </div>
+                                            </div>
+                                            <div class="layui-input-inline" style="margin-left: 22px;">
+                                                <div class="sel-ustcolor-div" data-alt="2">
+                                                    <i class="layui-icon">&#xe605;</i>
+                                                    <img src="" width="200px" class="sel-ustcolor">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">底部导航：</label>
+                                            <div class="layui-input-block">
+                                                <div class="sel-bottomnav-div" data-alt="1">
+                                                    <i class="layui-icon">&#xe605;</i>
+                                                    <img src="" width="360px" class="sel-bottomnav">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-block">
+                                                <div class="sel-bottomnav-div" data-alt="2">
+                                                    <i class="layui-icon">&#xe605;</i>
+                                                    <img src="" width="360px" class="sel-bottomnav">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-block">
+                                                <button class="layui-btn" lay-submit lay-filter="webconfig-form-edit-wtro">立即提交</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-tab-item">
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="wechatconfig-form-laji">
+
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">图片缓存</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="imgs_laji" placeholder="" autocomplete="off" class="layui-input">
+                                    <blockquote style="color: red;" class="layui-elem-quote">本地分享图片缓存，清理可全部删除</blockquote>
+                                </div>
+
+
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">数据缓存</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="data_laji" placeholder="" autocomplete="off" class="layui-input">
+                                    <blockquote style="color: red;" class="layui-elem-quote">显示0时则无数据缓存，清理时建议先备份数据库，每次清理5000条</blockquote>
+
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="wechatconfig-form-submit-lj">立即清理</button>
+
+<!--                                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        layui.use(['admin','layer', 'table' ,'form' , 'layedit' , 'upload' , 'colorpicker'], function(){
+            //定义表单
+            var $ = layui.$
+                ,admin = layui.admin
+                ,upload = layui.upload
+                ,element = layui.element
+                ,layer = layui.layer
+                ,colorpicker = layui.colorpicker
+                ,layedit = layui.layedit
+                ,form = layui.form;
+
+            // ------------------- 小程序颜色配置 -------------------------------------
+            // 底部导航选择
+            $('.sel-bottomnav-div').click(function () {
+                var dd = $(".sel-bottomnav-div").not($(this));
+                $(this).css('border','1px solid #009688');
+                $(this).find(".layui-icon").fadeIn("slow");
+                $(this).attr('alt','show');
+                // 清楚同类元素
+                dd.css('border','1px solid #f5f4f4');
+                dd.removeAttr('alt');
+                dd.find('i').css('display','none');
+            });
+
+            //  个人中心选择
+            $('.sel-ustcolor-div').click(function () {
+                var dd = $(".sel-ustcolor-div").not($(this));
+                $(this).css('border','1px solid #009688');
+                $(this).find(".layui-icon").fadeIn("slow");
+                $(this).attr('alt','show');
+                // 清楚同类元素
+                dd.css('border','1px solid #f5f4f4');
+                dd.removeAttr('alt');
+                dd.find('i').css('display','none');
+            });
+            //  还原颜色
+            $('#refresh-color').click(function () {
+                $('#app-color-form-input').val('#23aa8d');
+                colorpicker.render({
+                    elem: '#app-color-site'
+                    ,color: '#23aa8d'
+                    ,predefine: true
+                    ,colors: ['#23aa8d','#e75858', '#00ced1' , '#ff8c00']
+                    ,done: function(color){
+                        $('#app-color-form-input').val(color);
+                    }
+                });
+            });
+            //监听提交
+            form.on('submit(webconfig-form-edit-wtro)', function(data){
+                data.field.bottom_nav = $('.sel-bottomnav-div[alt="show"]').data('alt');
+                data.field.user_center_color = $('.sel-ustcolor-div[alt="show"]').data('alt');
+                if((data.field.bottom_nav == undefined) || data.field.user_center_color == undefined){
+                    layer.alert('数据有误,请重新提交!',{icon:2});
+                    return false;
+                }
+                //发送请求
+                admin.req({
+                    type:'POST',
+                    url: config.url+'web_config/save', //数据接口
+                    data:data.field,
+                    done:function(res){
+                        layer.msg('操作成功! ≥ ▽ ≤', {
+                            offset: 'auto'
+                            , icon: 1
+                            , time: 2000
+                        })
+                    }
+                });
+            });
+
+            admin.req({
+                type: 'POST',
+                url: config.url + 'order/lajis',//数据接口,
+                done: function (res) {
+                    if (res.data) {
+                        //预设元素
+                        form.val("wechatconfig-form-laji", {
+                            "imgs_laji" : res.data.imgs_laji,
+                            "data_laji" : res.data.data_laji,
+                        });
+
+                    }
+                }
+            });
+            // ------------------- 小程序颜色配置 OVER-------------------------------------
+
+
+            // ------------------- 版权配置 -------------------------------------
+            admin.req({
+                type: 'POST',
+                url: config.url + 'wechat_config/index',//数据接口
+                done: function (res) {
+                    if (res.data) {
+                        var acr = String(res.data.cright);
+                        //预设元素
+                        form.val("wechatconfig-form", {
+                            "id": res.data.id,
+                            "cright": acr,
+                            "copyright_link": res.data.copyright_link,
+                        });
+                        if(res.data.cright == 0){
+                            $('#cright-content .layui-upload').show();
+                            var str = '';
+                            if(res.data.copyright != ''){
+                                str += ' <ul style="margin-left: 0"><dd><img  width="100px" src="'+res.data.copyright+'"><input type="hidden" name="copyright" value="'+res.data.copyright+'"></dd></ul>';
+                            }else{
+                                str +=  '<ul style="margin-left: 0"></ul>';
+                            }
+                            $('#cright-upload-normal-img').append(str);
+                            $('#cright-content input[name="copyright"]').hide();
+                        }else{
+                            $('#cright-content .layui-upload').hide();
+                            ci.append('<input type="text" name="copyright"  value="'+res.data.copyright+'" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">')
+                        }
+                    }
+                }
+            });
+            var  index;
+            var ci = $('#cright-content');
+            layui.use('layedit', function(){
+                layedit = layui.layedit;
+                var url=config.url+'base_admin/upload?type=picture';//图片上传路径
+                index=layedit.build('demo',{
+                    height:600,
+                    uploadImage:{url: url, type:'post'},
+                }); //建立编辑器
+            });
+            //  版权信息选择
+            form.on('radio(cright)', function(data){
+                if(data.value == 0){
+                    $('#cright-content #cright-upload-normal-img').append('<ul style="margin-left: 0"></ul>');
+                    $('#cright-content .layui-upload').show();
+                    $('#cright-content input[type="text"]').remove();
+                }else{
+                    $('#cright-content input[type="text"]').remove();
+                    $('#cright-content #cright-upload-normal-img ul').remove();
+                    $('#cright-content .layui-upload').hide();
+                    ci.append('<input type="text" name="copyright" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">')
+                }
+            });
+
+            //普通图片上传
+            var uploadInsts = upload.render({
+                elem: '#cright-upload-normal'
+                ,url: config.url+'base_admin/upload'
+                ,data:{"type":"picture"}
+                ,size: 1700 //限制文件大小，单位 KB
+                ,multiple: true
+                ,before: function(obj){
+                    layer.load(0, {
+                        offset: 'auto'
+                    });
+                }
+                ,done: function(res){
+                    //上传完毕
+                    if (res.code > 0) {
+                        return layer.msg('上传失败');
+                    }
+                    $('#cright-upload-normal-img ul').empty();
+                    var str = '<dd><img  width="100px" src="'+res.data.src+'"><input type="hidden" name="copyright" value="'+res.data.src+'"></dd>';
+                    $('#cright-upload-normal-img ul').append(str)
+                    layer.closeAll();
+                }
+                , error: function () {
+                    //演示失败状态，并实现重传
+                    var demoText = $('#cright-upload-normal');
+                    demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                    demoText.find('.demo-reload').on('click', function () {
+                        uploadInsts.upload();
+                    });
+                }
+            });
+
+            //监听提交
+            form.on('submit(wechatconfig-form-submit)', function(data){
+                console.log(data.field)
+                //发送请求
+                admin.req({
+                    type:'POST',
+                    url: config.url+'wechat_config/save', //数据接口
+                    data:data.field,
+                    done:function(res){
+                        layer.msg('修改成功', {
+                            offset: '15px'
+                            ,icon: 1
+                            ,time: 1000
+                        });
+                    }
+                });
+            });
+            // ------------------- 版权配置 OVER-------------------------------------
+            form.on('submit(wechatconfig-form-submit-lj)', function(data){
+                layer.confirm('建议先备份数据库再清理数据哦，每次清理5000条', function(index) {
+                    //发送请求
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'order/lajis', //数据接口
+                        data: {'clear': 1},
+                        done: function (res) {
+                            layer.msg('清理成功', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                            });
+                            window.location.reload();
+                        }
+                    });
+                })
+
+            });
+
+            var table = layui.table;
+            //  幻灯片管理
+            var tableIns = table.render({
+                elem: '#test-table-autowidth'
+                ,url: config.url+'app_banner/index'//数据接口
+                ,toolbar: '#toolbar'
+                ,defaultToolbar:[]
+                ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                ,page:true
+                ,cols: [[
+                    {checkbox: true},
+                    {field:'id', title: 'ID', width: 50},
+                    {field:'banner_image', title: '浓缩图' , width: 100  ,templet:'<div><img width="50px" src="{{ d.banner_image }}"></div>'},
+                    {field:'link', title: '跳转链接' , width: 200},
+                    {field:'create_time', title: '创建时间'},
+                    {field:'update_time', title: '更改时间'},
+                    {fixed: 'right', title:'操作', toolbar: '#rights', width:150}
+                ]]
+            });
+            table.on('tool(test-table-autowidth)', function(obj){
+                var data = obj.data;
+                if(obj.event === 'del'){
+                    layer.confirm('您确定要删除吗?', function(index){
+                        layer.close(index);
+                        //掉删除接口
+                        admin.req({
+                            type: 'POST',
+                            url: config.url + 'web_config/bannerdel'//数据接口
+                            , data: {
+                                "id": data.id,
+                            },
+                            done: function (res) {
+                                layer.msg('操作成功!', {
+                                    offset: '15px'
+                                    , icon: 1
+                                    , time: 1000
+                                    , end:function () {
+                                        location.reload();
+                                    }
+                                });
+                                obj.del();
+
+                            }
+                        });
+                    });
+                }else if(obj.event === 'edit'){
+                    layer.open({
+                        type: 2
+                        ,title: '修改' //不显示标题栏
+                        ,closeBtn: false
+                        ,area:  ['700px', '700px']
+                        ,shade: 0.8
+                        ,shadeClose : true
+                        ,id: 'edit_layuipros'
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: config.html_url+'web_config/banneredit/id='+data.id
+                    });
+
+                    // window.location.href =config.html_url+'app_banner/edit/id='+data.id;
+                    /*layer.open({
+                        type: 2
+                        ,title: '修改' //不显示标题栏
+                        ,closeBtn: false
+                        ,area:  ['700px', '700px']
+                        ,shade: 0.8
+                        ,shadeClose : true
+                        ,id: 'edit_layuipros'
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: config.url+'goods/edit&id='+data.id
+                    });*/
+                }
+            });
+            //监听工具条
+            table.on('toolbar(test-table-autowidth)', function(obj){
+                var checkStatus = table.checkStatus(obj.config.id);
+                if(obj.event == 'checkok'){
+                    var obtype = $(this).data('type');
+                    var data = checkStatus.data;
+                    if(data == ''){
+                        layer.msg('未选择任何图片!', {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 1000
+                        });
+                        return false;
+                    }
+                    layer.confirm('您确定要删除选择吗?', function(index){
+                        //掉删除接口
+                        admin.req({
+                            type: 'POST',
+                            url: config.url + 'web_config/bannerdel'//数据接口
+                            , data: {
+                                "id": data,
+                            },
+                            done: function (res) {
+                                layer.msg('操作成功!', {
+                                    offset: '15px'
+                                    , icon: 1
+                                    , time: 2000
+                                    , end:function () {
+                                        location.reload();
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }else if(obj.event == 'addcheckok'){
+                    layer.open({
+                        type: 2
+                        ,title: '修改' //不显示标题栏
+                        ,closeBtn: false
+                        ,area:  ['700px', '700px']
+                        ,shade: 0.8
+                        ,shadeClose : true
+                        ,id: 'edit_layuipros'
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: config.html_url+'web_config/banneradd'
+                    });
+                    // window.location.href = config.html_url+'app_banner/add';
+                    /*layer.open({
+                        type: 2
+                        ,title: '添加' //不显示标题栏
+                        ,closeBtn: false
+                        ,area:  ['700px', '700px']
+                        ,shade: 0.8
+                        ,shadeClose : true
+                        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: config.url+'goods/add'
+                    });*/
+                }
+            });
+            //------------------------------ BANNER OVER -----------------------------------------------
+
+            var ourl = config.url+'base_admin/upload';
+            captain = layedit.build('captain',{
+                height:300,
+                uploadImage:{url: ourl, type: 'post'}
+
+            });
+            supplier = layedit.build('supplier',{
+                height:300,
+                uploadImage:{url: ourl, type: 'post'}
+
+            });
+            privacy = layedit.build('privacy',{
+                height:300,
+                tool: ['strong','italic','underline','strikeThrough','left','center','right','link','unlink'],
+                // uploadImage:{url: ourl, type: 'post'}
+            });
+
+            accredited = layedit.build('accredited',{
+                height:300,
+                tool: ['image'],
+                uploadImage:{url: ourl, type: 'post'}
+            });
+
+            //查询配置
+            admin.req({
+                type:'POST',
+                url: config.url+'web_config/index',//数据接口
+                done:function(res){
+                    if(res.data){
+                        layedit.setContent(privacy,res.data.privacy);
+                        layedit.setContent(supplier,res.data.supplier);
+                        layedit.setContent(captain,res.data.captain);
+                        layedit.setContent(accredited,res.data.accredited);
+                        //预设元素
+                        form.val("webconfig-form-fons", {
+                            "app_bg_color": res.data.app_bg_color,
+                        });
+
+                        colorpicker.render({
+                            elem: '#app-color-site'
+                            ,color: res.data.app_bg_color
+                            ,predefine: true
+                            ,colors: ['#23aa8d','#e75858', '#00ced1' , '#ff8c00']
+                            ,done: function(color){
+                                $('#app-color-form-input').val(color);
+                            }
+                        });
+                        checkdco(res.data.navs , res.data.bottom_nav ,'sel-bottomnav-div');
+                        checkdco(res.data.center_colors , res.data.user_center_color ,'sel-ustcolor-div');
+                        //    底部导航OVER
+
+                    }
+                }
+            });
+
+            /* 自定义验证规则 */
+            form.verify({
+                captain: function(value) {
+                    return layedit.sync(captain);
+                },
+                supplier: function(value) {
+                    return layedit.sync(supplier);
+                },
+                privacy: function(value) {
+                    return layedit.sync(privacy);
+                },
+                accredited: function(value) {
+                    return layedit.sync(accredited);
+                },
+            });
+
+            //监听提交
+            form.on('submit(webconfig-form-edit)', function(data){
+                console.log(data.field);
+                //发送请求
+                admin.req({
+                    type:'POST',
+                    url: config.url+'web_config/save', //数据接口
+                    data:data.field,
+                    done:function(res){
+                        layer.msg('操作成功! ≥ ▽ ≤', {
+                            offset: 'auto'
+                            , icon: 1
+                            , time: 2000
+                        })
+                    }
+                });
+            });
+            /*
+            *  cobjs 选择图
+            *  initc 默认选择
+            *  cdom 对象
+            *  showc 是否显示边框
+            * */
+            function checkdco(cobjs , initc , cdom){
+                $.each(cobjs,function(idx,obj){
+                    idx = idx+1;
+                    $('.'+cdom+'[data-alt="'+idx+'"] img').attr('src',obj);
+                });
+                var objs =  $('.'+cdom+'[data-alt="'+initc+'"]');
+                objs.css('border','1px solid #009688');
+                /*
+                        objs.append('<i class="layui-icon" style="    left: 355px;top: -6px;font-size: 26px;color: red;font-weight: bolder;position: absolute;">&#xe605;</i>');*/
+                objs.attr('alt','show');
+                objs.find(".layui-icon").fadeIn("slow");
+            }
+            //选择下拉
+
+            $('.del-image').on('click','.layui-icon', function () {
+                $(this).parents('dd').remove();
+            });
+            //多图片上传
+            /*upload.render({
+                elem: '#test-upload-normal2'
+                ,url: config.url+'base_admin/upload'
+                ,data:{"type":"picture"}
+                ,multiple: true
+                ,before: function(obj){
+                    layer.load(0, {
+                        offset: 'auto'
+                    });
+                }
+                ,done: function(res){
+                    //上传完毕
+                    if (res.code > 0) {
+                        return layer.msg('上传失败');
+                    }
+                    var str = '<dd><i class="layui-icon">&#x1007;</i> <img  width="100px" src="'+res.data.src+'"> <p id="test-upload-demoText2"></p><input type="hidden" name="banner[]" value="'+res.data.id+'" id="cover_value"></dd>';
+                    $('#test-upload-normal-img2 ul').append(str)
+                    layer.closeAll();
+                }
+            });*/
+        });
+    </script>

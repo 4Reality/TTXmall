@@ -1,0 +1,345 @@
+<button class="layui-btn layui-btn-normal layui-btn-sm" style="position: fixed;
+    z-index: 9999;
+        margin-left: 14px; margin-top: 2px;
+    background-color: #1e9fff9e;" onclick="javascript:history.back(-1);"><i class="layui-icon"></i>返回上一级</button>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>创卷中心</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab layui-tab-brief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">节日券</li>
+                    <li>优惠券</li>
+                    <li>新人券</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <!--满减设置内容-->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">状态</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">节日券名称</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="coupon_name" lay-verify="required" class="layui-input" id="coupon_name" placeholder="优惠券名称">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">使用门槛（元）</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="full_money" lay-verify="required|number" class="layui-input" id="full_money" placeholder="购物达到使用门槛后才能使用">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">优惠金额（元）</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="free_money" class="layui-input" id="free_money" placeholder="请输入优惠金额">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">发放数量</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="max_num" class="layui-input" id="max_num" placeholder="请输入发放数量">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">限用分类</label>
+                                <div class="layui-input-block">
+                                    <select name="limit_goods" xm-select="select8"  xm-select-radio xm-select-search="">
+                                    </select>
+                                </div>
+                                <blockquote style="margin-left: 110px;color: red" class="layui-elem-quote">不选则不限制</blockquote>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">发放方式</label>
+                                <div  class="layui-input-block">
+                                    <input id="index_send"  type="radio"  name="send_type" value="0" title="前端领取">
+                                    <input id="admin_send"  type="radio"  name="send_type" value="1" title="后台发放">
+                                </div>
+                                <blockquote style="margin-left: 110px;color: red" class="layui-elem-quote">选择后台发放，用户将不可自行领取，选择前段领取，后台将不可发放</blockquote>
+                            </div>
+
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">过期时间</label>
+                                <div class="layui-input-block">
+<!--                                    <input type="text" lay-verify="required|number" name="expiration_time" class="layui-input" id="expiration_time" placeholder="请输入过期时间（天）">-->
+
+                                    <input type="text" name="expiration_time" class="layui-input" lay-verify="required" id="expiration_time" placeholder="请选择新人券过期时间">
+                                </div>
+                                <blockquote style="margin-left: 110px;color: red" class="layui-elem-quote">节日券在该设置时间内有效</blockquote>
+
+                            </div>
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="minus-form-sbmiy">立即提交</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="component-form-group-xcx">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">状态</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">优惠券名称</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="coupon_name" lay-verify="required" class="layui-input"  placeholder="优惠券名称">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">使用门槛（元）</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="full_money" lay-verify="required|number" class="layui-input"  placeholder="购物达到使用门槛后才能使用">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">优惠金额（元）</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="free_money" class="layui-input"  placeholder="请输入优惠金额">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">发放数量</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="max_num" class="layui-input"  placeholder="请输入发放数量">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">限用分类</label>
+                                <div class="layui-input-block">
+                                    <select name="limit_goods" xm-select="select8"  xm-select-radio xm-select-search="">
+                                    </select>
+                                </div>
+                                <blockquote style="margin-left: 110px;color: red" class="layui-elem-quote">不选则不限制</blockquote>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">发放方式</label>
+                                <div  class="layui-input-block">
+                                    <input  lay-filter="send_type" type="radio"  name="send_type" value="0" title="前端领取">
+                                    <input  lay-filter="send_type" type="radio"  name="send_type" value="1" title="后台发放">
+                                </div>
+                                <blockquote style="margin-left: 110px;color: red" class="layui-elem-quote">选择后台发放，用户将不可自行领取，选择前段领取，后台将不可发放</blockquote>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">过期时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="expiration_time" class="layui-input"  placeholder="请输入过期时间（天）">
+
+                                    <!--<input type="text" name="expiration_time" class="layui-input" lay-verify="required" id="expiration_time" placeholder="请选择过期时间">-->
+                                </div>
+                                <blockquote style="margin-left: 110px;color: red" class="layui-elem-quote">领取时间超过设置时间优惠券将会失效</blockquote>
+
+                            </div>
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="minus-form-sbmiys">立即提交</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="component-form-group">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">状态</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="开启|关闭">
+                                </div>
+                            </div>
+
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">优惠金额（元）</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="free_money" class="layui-input" id="free_moneys" placeholder="请输入优惠金额">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">过期时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" lay-verify="required|number" name="expiration_time" class="layui-input" id="expiration_time" placeholder="请输入过期时间（天）">
+
+                                    <!--<input type="text" name="expiration_time" class="layui-input" lay-verify="required" id="expiration_times" placeholder="请选择新人券过期时间">-->
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="minus-form-sbmiy-user">立即提交</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form' , 'laydate','formSelects'], function(){
+        //定义表单
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,laydate = layui.laydate
+            ,formSelects = layui.formSelects
+            ,form    = layui.form;
+        //常规用法
+        laydate.render({
+            elem: '#expiration_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+        });
+        admin.req({
+            type:'POST',
+            url: config.url+'minus/getGoods'//数据接口
+            ,data:{},
+            done:function(res){
+                // console.log(res)
+                if(res.data){
+                    //预设元素
+                    formSelects.data('select8', 'server', {
+                        url: config.url+'minus/newGoods&mid='+res.data.id,
+                        keyword: '',
+                    });
+                }
+                formSelects.render();
+            }
+        });
+        form.render();
+
+        //监听提交
+        form.on('submit(minus-form-sbmiy)', function(data){
+            //发送请求
+            data.field.coupon_type=3;
+            admin.req({
+                type:'POST',
+                url: config.url+'minus/saveNews', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data==200){
+                        layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                            window.location.href =config.html_url+'minus/coupon_list';
+                        });
+                    }else if(res.data==401){
+                        layer.msg('优惠金额不得大于等于门槛金额！！', {
+                            offset: '15px'
+                            , icon: 0
+                            , time: 1000
+                        });
+                    }else if(res.data==402){
+                        layer.msg('过期时间不得小于现在时间', {
+                            offset: '15px'
+                            , icon: 0
+                            , time: 1000
+                        });
+                    }
+                }
+            });
+        });
+
+
+        form.on('submit(minus-form-sbmiys)', function(data){
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'minus/saveNews', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data==200){
+                        layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                            window.location.href =config.html_url+'minus/coupon_list';
+                        });
+                    }else if(res.data==401){
+                        layer.msg('优惠金额不得大于等于门槛金额！！', {
+                            offset: '15px'
+                            , icon: 0
+                            , time: 1000
+                        });
+                    }else if(res.data==402){
+                        layer.msg('过期时间不得小于现在时间', {
+                            offset: '15px'
+                            , icon: 0
+                            , time: 1000
+                        });
+                    }
+                }
+            });
+        });
+
+        admin.req({
+            type:'POST',
+            url: config.url+'minus/newsIndexMan',//数据接口
+            done:function(res){
+                if(res.data){
+                    //预设元素
+                    form.val("component-form-group", {
+                        "status": (res.data.status) ? 1 : 0,
+                        "free_money": res.data.free_money,
+                        "expiration_time":res.data.expiration_time,
+                    });
+                }
+            }
+        });
+
+        //监听提交
+
+        form.on('submit(minus-form-sbmiy-user)', function(data){
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'minus/saveNewsMan', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data==200){
+                        layer.msg('操作成功! ≥...≤!!!', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        });
+                    }else if(res.data==402){
+                        layer.msg('过期时间不得小于现在时间', {
+                            offset: '15px'
+                            , icon: 0
+                            , time: 1000
+                        });
+                    }
+                }
+            });
+        });
+
+    });
+</script>

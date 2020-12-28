@@ -1,0 +1,222 @@
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">首页设置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" action="" lay-filter="wechatconfig-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">全部商品</label>
+                    <div  class="layui-input-block">
+                        <input class="hid" lay-filter="hope" type="radio"  name="wechat_config[hope]" value="0" title="隐藏">
+                        <input class="top" lay-filter="hope" type="radio"  name="wechat_config[hope]" value="1" title="头显示">
+                        <input class="hod" lay-filter="hope" type="radio"  name="wechat_config[hope]" value="2" title="尾显示">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">弹幕显示</label>
+                    <div  class="layui-input-block">
+                        <input class="dm_show" lay-filter="is_dm" type="radio"  name="wechat_config[is_dm]" value="0" title="显示">
+                        <input class="dm_hiden" lay-filter="is_dm" type="radio"  name="wechat_config[is_dm]" value="1" title="隐藏">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">购买记录</label>
+                    <div  class="layui-input-block">
+                        <input class="sale_show" lay-filter="is_sale" type="radio"  name="wechat_config[is_sale]" value="0" title="显示">
+                        <input class="sale_hiden" lay-filter="is_sale" type="radio"  name="wechat_config[is_sale]" value="1" title="隐藏">
+
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类样式</label>
+                    <div  class="layui-input-block">
+                        <input class="cat_show" lay-filter="is_sale" type="radio"  name="wechat_config[all_cat]" value="0" title="全部分类商品">
+                        <input class="cat_hiden" lay-filter="is_sale" type="radio"  name="wechat_config[all_cat]" value="1" title="当前分类商品">
+
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">搜索框</label>
+                    <div  class="layui-input-block">
+                        <input class="search_show"  lay-filter="is_sale" type="radio"  name="wechat_config[is_search]" value="0" title="隐藏">
+                        <input class="search_hiden" lay-filter="is_sale" type="radio"  name="wechat_config[is_search]" value="1" title="显示">
+
+                    </div>
+                </div>
+                <!--<div class="layui-form-item">-->
+                <!--<label class="layui-form-label">社区距离</label>-->
+                <!--<div  class="layui-input-block">-->
+                <!--<input class="cat_show" lay-filter="distance" type="text"  name="wechat_config[distance]" value="0" title="社区距离">-->
+
+                <!--</div>-->
+                <!--</div>-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">社区距离</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="wechat_config[distance]" lay-verify="required|number" autocomplete="off" class="layui-input">
+                    </div>
+                    <span style="font-size: 16px;
+    font-weight: 400;
+    line-height: 38px;
+    text-align: right;">千米</span>
+                    <blockquote style="margin-left: 110px" class="layui-elem-quote">超出设置距离，用户无法定位到社区（填0不限制，审核时请关闭限制）</blockquote>
+
+                    <!--<blockquote style="margin-left: 7rem;color: red" class="layui-elem-quote" id="notice">订单收货后，在设置时间后订单将自动核销</blockquote>-->
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">今日推荐</label>
+                    <div class="layui-upload">
+                        <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button>
+                        <div class="layui-upload-list del-image"  id="test-upload-normal-img"><ul></ul></div>
+                        <blockquote style="margin-left: 110px" class="layui-elem-quote">图片尺寸710*200px 最多只能上传1.2M之内的图片</blockquote>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="captain-from-edit-submit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin','layer','form' ,'upload', 'layedit' , 'formSelects'], function() {
+        var $            = layui.$
+            ,admin       = layui.admin
+            ,layer       = layui.layer
+            ,formSelects = layui.formSelects
+            ,upload      = layui.upload
+            ,form        = layui.form;
+        layui.use('form', function() {
+            form.render();
+        });
+        formSelects.data('cityid', 'server', {
+            url: config.url+'cities/selectlistAll',
+            keyword: '',
+        });
+        $('.del-image').on('click','.layui-icon', function () {
+            $(this).parents('dd').remove();
+        });
+
+        form.on('checkbox(reflect)',function(data){
+            console.log(data);
+            var len=$(".education:checked").length;
+            if(len>2){
+                $(data.elem).next().attr("class","layui-unselect layui-form-checkbox");
+                $(data.elem).prop("checked",false);
+                layer.msg('最多只能选2项！',{icon:5});
+                return false;
+            }
+        });
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'Userwallet/getSite',//数据接口
+            done:function(res) {
+                if (res.data) {
+                    console.log(res.data)
+                    if(res.data.wechat_config.hope==0||res.data.wechat_config.hope==null){
+                        $('.hid').attr('checked','checked');
+                    }else if(res.data.wechat_config.hope==1){
+                        $('.top').attr('checked','checked');
+                    }else if(res.data.wechat_config.hope==2){
+                        $('.hod').attr('checked','checked');
+                    }
+
+                    if(res.data.wechat_config.is_dm==0||res.data.wechat_config.is_dm==null){
+                        $('.dm_show').attr('checked','checked');
+                    }else if(res.data.wechat_config.is_dm==1){
+                        $('.dm_hiden').attr('checked','checked');
+                    }
+                    if(res.data.wechat_config.is_sale==0||res.data.wechat_config.is_sale==null){
+                        $('.sale_show').attr('checked','checked');
+                    }else if(res.data.wechat_config.is_sale==1){
+                        $('.sale_hiden').attr('checked','checked');
+                    }
+                    if(res.data.wechat_config.all_cat==0||res.data.wechat_config.all_cat==null){
+                        $('.cat_show').attr('checked','checked');
+                    }else if(res.data.wechat_config.all_cat==1){
+                        $('.cat_hiden').attr('checked','checked');
+                    }
+                    if(res.data.wechat_config.is_search==0||res.data.wechat_config.is_search==null){
+                        $('.search_show').attr('checked','checked');
+                    }else if(res.data.wechat_config.is_search==1){
+                        $('.search_hiden').attr('checked','checked');
+                    }
+                    if(res.data.wechat_config.today_img != ''&&res.data.wechat_config.today_img != 0){
+                        console.log('aaa')
+                        var str = '<dd><i class="layui-icon" >&#x1007;</i> <img  width="100px" src="'+res.data.wechat_config.today_img+'"> <p id="test-upload-demoText"></p><input type="hidden" name="wechat_config[today_img]" value="'+res.data.wechat_config.today_img+'"></dd>';
+                        $('#test-upload-normal-img ul').append(str);
+                    }
+                    //
+                    // if(res.data.wechat_config.balance_status==0||res.data.wechat_config.hope==null){
+                    //     $('.open_balance').attr('checked','checked');
+                    // }else if(res.data.wechat_config.balance_status==1){
+                    //     $('.close_balance').attr('checked','checked');
+                    // }
+                    var acr = String(res.data.wechat_config.cright);
+                    //预设元素
+                    form.val("wechatconfig-form", {
+                        "id": res.data.id,// "name": "value"
+                        "wechat_config[distance]": res.data.wechat_config.distance,// "name": "value"
+                    });
+
+                }
+            }
+        });
+        form.on('submit(captain-from-edit-submit)', function(data){
+            $.post(config.url+'User/Site',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.msg('设置成功! ≥ ▽ ≤', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }
+                });
+            return false;
+        });
+        var uploadInst = upload.render({
+            elem: '#test-upload-normal'
+            ,url: config.url+'base_admin/upload'
+            ,data:{"type":"picture"}
+            ,multiple: true
+            ,size: 1700 //限制文件大小，单位 KB
+            ,before: function(obj){
+                layer.load(0, {
+                    offset: 'auto'
+                });
+            }
+            ,done: function(res){
+                //上传完毕
+                // console.log(res)
+
+                if (res.code > 0) {
+                    return layer.msg('上传失败');
+                }
+                $('#test-upload-normal-img ul').empty();
+                var str = '<dd><i class="layui-icon">&#x1007;</i> <img  width="100px" src="'+res.data.src+'"> <p id="test-upload-demoText1"></p><input type="hidden" name="wechat_config[today_img]" value="'+res.data.src+'" id="cover_value"></dd>';
+                $('#test-upload-normal-img ul').append(str)
+                layer.closeAll();
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#test-upload-demoText1');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+        });
+    });
+</script>

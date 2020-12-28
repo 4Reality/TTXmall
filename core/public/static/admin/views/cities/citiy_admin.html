@@ -1,0 +1,116 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">设置城市账号</div>
+      <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="goods-cat-form-add">
+        <blockquote style="margin-left: 110px;color: red" class="layui-elem-quote">若忘记密码可以重新设置密码</blockquote>
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">用户名</label>
+          <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="required|lengthnow" autocomplete="off" placeholder="请设置用户名" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">密码</label>
+          <div class="layui-input-block">
+            <input type="password" name="password" lay-verify="required" autocomplete="off" placeholder="请设置密码" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">确定密码</label>
+          <div class="layui-input-block">
+            <input type="password" name="passwords" lay-verify="required" autocomplete="off" placeholder="请确定密码" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="goods-cat-form-add-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script>
+      layui.use(['admin','layer','upload', 'form' , 'formSelects'], function() {
+          var $ = layui.$
+              ,admin = layui.admin
+              ,upload = layui.upload
+              ,layer = layui.layer
+              ,formSelects = layui.formSelects
+              ,form = layui.form;
+          var layedit;
+          var router = layui.router();
+          var id = router.search.id;
+          if(typeof(id)=='undefined'){
+            id=0;//默认新增
+          }
+          layui.use('layedit', function(){
+             layedit = layui.layedit;
+              var url=config.url+'base_admin/upload';
+              index = layedit.build('goods_content',{
+                  height:300,
+                  uploadImage:{url: url, type: 'post'}
+
+              }); //建立编辑器
+          });
+          form.verify({
+              lengthnow: function(value){
+                  if(value.length > 20){
+                      return '用户名至多只能是20字呀! ≥...≤!~';
+                  }
+              }
+          });
+          layui.use('form', function() {
+              form.render();
+          });
+          form.render();
+          //查询配置
+          admin.req({
+            type:'POST',
+            data: {
+              "citiy_id": id,
+            },
+            url: config.url+'cities/getAdmin/citiy_id='+id,//数据接口
+            done:function(res){
+              if(res.data){
+                form.val("goods-cat-form-add", {
+                  "username": res.data.username,
+                  "password": res.data.password
+                });
+              }
+            }
+          });
+
+          form.on('submit(goods-cat-form-add-submit)', function(data){
+            data.field.citiy_id = id;
+              $.post(config.url+'cities/addAdmin',
+                  data.field,
+                  function(res){
+                     if(res.code == 0){
+                         layer.alert('添加成功! ≥ ▽ ≤', function(index){
+                             window.parent.layer.closeAll();
+                             window.parent.location.reload()
+                         });
+                     }else{
+                         layer.msg(res.data, {
+                             icon: 2
+                         })
+                     }
+              });
+              return false;
+          });
+          /* 自定义验证规则 */
+          form.verify({
+              content: function(value) {//验证富文本编辑器
+                  return layedit.sync(index);
+              },
+          });
+
+          $('.del-image').on('click','.layui-icon', function () {
+              $(this).parents('dd').remove();
+          });
+      });
+  </script>
+

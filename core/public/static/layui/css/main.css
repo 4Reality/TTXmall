@@ -1,0 +1,20 @@
+
+/*   ID层级高时去掉*/
+/*#LAY-system-side-menu a cite{
+     color: #000000;
+}*/
+
+.layui-nav-item a cite{
+    color: #000000;
+}
+#LAY-system-side-menu i{
+    color: #000000;
+}
+.layui-logo span{
+    color: #000000;;
+}
+
+.layui-nav-tree .layui-this a cite{
+    color: #fff;
+}
+

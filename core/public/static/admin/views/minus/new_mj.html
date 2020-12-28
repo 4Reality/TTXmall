@@ -1,0 +1,199 @@
+<style>
+    .layui-form-label{
+        padding: 9px 8px;
+        width: inherit;
+    }
+</style>
+<title>满减</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>满减</cite></a>
+    </div>
+
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header layui-form layuiadmin-card-header-auto" lay-filter="order-from-search">
+                    <div class="layui-form-item">
+
+
+                    </div>
+                    <input type="hidden" id="search" name="search">
+                </div>
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"> </table>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加满减
+                            </button>
+                        </div>
+                    </script>
+                    <script type="text/html" id="switchTpl">
+                        <input type="checkbox" name="status" value="{{d.id}}"  lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-bg-cyan layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                        <a class="layui-btn layui-bg-red layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-edit"></i>删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table' , 'laydate' , 'util'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,form = layui.form
+            ,util = layui.util;
+
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'minus/mjIndex'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                {field:'full', title: '满',templet:function (d) {
+                        return '<b style="color: red">¥'+d.full+'</b>';
+                    }},
+                {field:'discount', title: '减',templet:function (d) {
+                        return '<b style="color: red">¥'+d.discount+'</b>';
+                    }},
+                {field:'status', title: '状态'
+                    ,templet:  '#switchTpl', unresize: true,width:150
+                },
+                {fixed: 'right', title:'操作', toolbar: '#rights',align: 'center'}
+            ]]
+        });
+        form.on('switch(status)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'minus/editMjStatus'//数据接口
+                , data: {
+                    "id": obj.value,
+                },
+                done: function (res) {
+                    if(res.data == 200){
+                        layer.msg('操作成功!', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        });
+                    }
+                }
+            });
+        });
+        form.render();
+
+        // 动态载入下拉选择
+        function jsonInit(objsons , object) {
+            $.each(objsons,function(idx,obj){
+                object.options.add(new Option(obj,idx));
+
+            });
+        }
+        //初始化json
+        var json = {};
+        form.on('select(aihao)', function(data){
+            var name = data.elem.name;
+            json.se = 1;
+            switch (name) {
+                case ("print_status"):
+                    json.print_status = data.value;
+                    break;
+                case ("captain"):
+                    json.cap_id = data.value;
+                    break;
+                case ("city"):
+                    json.cityid = data.value;
+                    break;
+                case ("delivery_time"):
+                    json.delivery_time = data.value;
+                    break;
+            }
+            JSON.stringify(json);
+            //执行重载
+            tableIns.reload( {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                ,where: {
+                    json
+                }
+            });
+        });
+
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload').val();
+                console.log(demoReload)
+                json.nickname = demoReload;
+                JSON.stringify(json);
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        json
+                    }
+                });
+            },
+
+        };
+
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        console.log(config.url + 'order/printer');
+
+        //监听工具条
+        table.on('toolbar(test-table-autowidth)', function(obj) {
+            if(obj.event == 'addcheckok'){
+                window.location.href = config.html_url+'minus/new_mj_add';
+            }
+        });
+        table.on('tool(test-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                window.location.href =config.html_url+'minus/new_mj_edit/id='+data.id;
+            }else if(obj.event === 'del'){
+
+                layer.confirm('您确定要删除选择?', function(index){
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'minus/delMj'//数据接口
+                        , data: {
+                            "id": data.id,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                            });
+                            location.reload();
+                        }
+                    });
+                });
+
+            }
+        });
+    });
+</script>

@@ -1,0 +1,199 @@
+
+<title>首页公告</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>首页公告</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">首页公告</div>
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"></table>
+
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加
+                            </button>
+                            <button class="layui-btn" data-type="2"  lay-event="checkok">
+                                <i class="layui-icon">&#xe640;</i>删除
+                            </button>
+                        </div>
+                    </script>
+                    
+                    <!--图片-->
+                    <script id="imgAlbum" type="text/html">
+                        <div>
+                            {{# layui.each(d.goods_headimages, function(index, item){ }}
+                                <img src="{{ item }}" width="50px">
+                            {{# }); }}
+                        </div>
+                    </script>
+                    <!--图片-->
+                    <script id="tag_text" type="text/html">
+                        <div>
+                            {{# layui.each(d.tag_text, function(index, item){ }}
+                            <a class="layui-btn layui-btn-normal layui-btn-xs"  lay-event="tag">{{ (item.type == 0) ? '限购' : '满减'  }}</a>
+                            {{# }); }}
+                        </div>
+                    </script>
+                    <script type="text/html" id="rights">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs"  lay-event="edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+                        <a class="layui-btn layui-btn-primary layui-btn-xs"  lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,form = layui.form;
+
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'app_notice/index'//数据接口
+            ,toolbar: '#toolbar'
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                {checkbox: true},
+                {field:'id', title: 'ID', width: 50},
+                {field:'notice_content', title: '公告内容' , width: 200},
+                // {field:'link', title: '跳转链接' , width: 200},
+                {field:'create_time', title: '创建时间'},
+                {field:'update_time', title: '更改时间'},
+                {fixed: 'right', title:'操作', toolbar: '#rights', width:150}
+            ]]
+        });
+
+        /*form.on('switch(capStatus)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'goods/edit'//数据接口
+                , data: {
+                    "id": obj.value,
+                    "status": (obj.elem.checked) ? 1 : 0,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });*/
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        table.on('tool(test-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('您确定要删除吗?', function(index){
+                    layer.close(index);
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'app_notice/del'//数据接口
+                        , data: {
+                            "id": data.id,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                , end:function () {
+                                    location.reload();
+                                }
+                            });
+                            obj.del();
+
+                        }
+                    });
+                });
+            }else if(obj.event === 'edit'){
+                window.location.href =config.html_url+'app_notice/edit/id='+data.id;
+                /*layer.open({
+                    type: 2
+                    ,title: '修改' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['700px', '700px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'edit_layuipros'
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.url+'goods/edit&id='+data.id
+                });*/
+            }
+        });
+        //监听工具条
+        table.on('toolbar(test-table-autowidth)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            if(obj.event == 'checkok'){
+                var obtype = $(this).data('type');
+                var data = checkStatus.data;
+                if(data == ''){
+                    layer.msg('未选择任何图片!', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 1000
+                    });
+                    return false;
+                }
+                layer.confirm('您确定要删除选择吗?', function(index){
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'app_notice/del'//数据接口
+                        , data: {
+                            "id": data,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                                , end:function () {
+                                    location.reload();
+                                }
+                            });
+                        }
+                    });
+                });
+            }else if(obj.event == 'addcheckok'){
+                window.location.href = config.html_url+'app_notice/add';
+                /*layer.open({
+                    type: 2
+                    ,title: '添加' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['700px', '700px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.url+'goods/add'
+                });*/
+            }
+        });
+
+    });
+</script>

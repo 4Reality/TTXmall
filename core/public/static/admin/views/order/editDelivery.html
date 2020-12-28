@@ -1,0 +1,100 @@
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" onsubmit=" return  false" lay-filter="adddly-form-edit">
+        <fieldset class="layui-elem-field">
+          <legend>团长上门配送时间段</legend>
+          <div class="layui-field-box">
+            <div class="layui-form-item partime">
+              <div class="layui-inline">
+                <label class="layui-form-label">时间段：</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="start_time" class="layui-input time" id="start_time"  lay-verify="required" placeholder="X点X分">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="end_time" class="layui-input time" id="end_time" lay-verify="required" placeholder="X点X分">
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="adddly-form-edit-submit">立即提交</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script>
+      layui.use(['layer','laydate', 'form'], function() {
+          var $ = layui.jquery
+              , upload = layui.upload
+              ,laydate = layui.laydate
+              ,layer = layui.layer
+              ,form = layui.form;
+
+          var router = layui.router();
+          var id = router.search.id;
+          if(typeof(id)=='undefined'){
+              id=0;//默认新增
+          }
+
+          admin.req({
+              type:'POST',
+              url: config.url+'order/editDelivery'//数据接口
+              ,data:{"id":id},
+              done:function(res){
+                  if(res.data){
+                      //预设元素
+                      form.val("adddly-form-edit", {
+                          "start_time": res.data.start_time,
+                          "end_time": res.data.end_time,
+
+                      });
+                  }
+              }
+          });
+          laydate.render({
+              elem: '#start_time'
+              , format: 'HH:mm'
+              , type: 'time'
+          });
+          laydate.render({
+              elem: '#end_time'
+              ,type: 'time'
+              , format: 'HH:mm'
+          });
+          /* 监听提交 */
+          form.on('submit(adddly-form-edit-submit)', function(data){
+              data.field.id = id;
+              admin.req({
+                  type: 'POST',
+                  url: config.url + 'order/editDelivery'//数据接口
+                  , data: data.field
+                  , done: function (res) {
+                      if(res.data != 200){
+                          strs = '<b style="color: red;">≥...≤!~ 结束时间必须大于'+res.data +'</b>';
+                          layer.alert(strs, {icon: 2});
+                          return false
+                      }else{
+                          layer.msg('O(∩_∩)O~ 操作成功!', {
+                              offset: '15px'
+                              , icon: 1
+                              , time: 2000
+                              ,end:function () {
+                                  window.parent.layer.closeAll();
+                                  window.parent.location.reload()
+                              }
+                          });
+                      }
+
+                  }
+              });
+              return false;
+          });
+      });
+  </script>
+

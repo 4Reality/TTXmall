@@ -1,0 +1,198 @@
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="layui-tab layui-tab-brief" lay-filter="activity-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">团长明细</li>
+                            <!--<li  id="notready">未绑定的团长</li>-->
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <table class="layui-hide" id="avtivty-table" lay-filter="avtivty-table"></table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-hide" id="avtivty-add-table" lay-filter="avtivty-add-table"></table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已选择的商品 -->
+                    <!--<script type="text/html" id="rights">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs"   lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+                    </script>-->
+                    <script id="city_text" type="text/html">
+                        <div>
+                            {{# layui.each(d.city_text, function(index, item){ }}
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" >{{ item }}</a>
+                            {{# }); }}
+                        </div>
+                    </script>
+                    <!--over-->
+
+                    <!-- 未选择的商品 -->
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container" >
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" id="chetoolbar1" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加所选
+                            </button>
+                        </div>
+                    </script>
+                    <!-- over -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin', 'table'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,form    = layui.form;
+        var router = layui.router();
+        var id = router.search.id;
+        var end_time = router.search.end_time;
+        var dis = 0;
+        if(end_time < new Date().getTime()/1000){
+            $('#notready').empty();
+            dis = 1;
+        }
+        var tableIns = table.render({
+            elem: '#avtivty-table'
+            ,url: config.url+'captain/capCashList'//数据接口
+            ,where:{
+                'cap_id':id,
+            }
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                {field:'atv_id', title: '活动期数'},
+                {field:'cap_name', title: '团长名字'},
+                {field:'pay_price', title: '总流水',templet:function (d) {
+                        return '<b style="color: red">¥'+d.pay_price+'</b>';
+                    }},
+                {field:'fx_price', title: '佣金',templet:function (d) {
+                        return '<b style="color: red">¥'+d.fx_price+'</b>';
+                    }},
+                {field:'limit_price', title: '成本',templet:function (d) {
+                        return '<b style="color: red">¥'+d.limit_price+'</b>';
+                    }},
+                {field:'profit_price', title: '利润',templet:function (d) {
+                        return '<b style="color: red">¥'+d.profit_price+'</b>';
+                    }},
+            ]]
+        });
+
+        //监听工具条
+        table.on('toolbar(avtivty-add-table)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            if(obj.event == 'addcheckok'){
+                var obdata = checkStatus.data;
+                if(obdata == ''){
+                    layer.msg('未选择任何团长!', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 1000
+                    });
+                    return false;
+                }
+
+                // return false;
+                //掉删除接口
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'captain/bindCaptain'//数据接口
+                    ,
+                    data: {
+                        'data'   : obdata,
+                        'cap_id' : id,
+                        'type'   : 1
+                    },
+                    beforeSend: function () {
+                        layer.load(0, {
+                            offset: 'auto'
+                        });
+                    },
+                    done: function (res) {
+                        if(res.data == 200){
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            })
+                        }else{
+                            layer.msg(res.data, {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            });
+                        }
+
+                    }
+                });
+            }else if(obj.event == 'addAll'){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/addGoods'//数据接口
+                    , data: {
+                        'atvid' : id,
+                        'type' : 2
+                    },
+                    beforeSend: function () {
+                        layer.load(0, {
+                            offset: 'auto'
+                        });
+                    },
+                    done: function (res) {
+                        if(res.data == 200){
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            })
+                        }else{
+                            layer.msg(res.data, {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                                , end:function () {
+                                    admin.events.refresh()
+                                }
+                            });
+                        }
+
+                    }
+                });
+            }else if(obj.event == 'addGoods'){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/tiao'
+                    , data: {
+                        'atvid' : id,
+                    }
+                    ,done: function (res) {
+                        window.parent.layer.closeAll();
+                        window.parent.location.reload();
+                    }
+                });
+            }
+            return false;
+        });
+        //  -------------------------  未选的商品 OVER  -------------------------------------------
+
+    });
+</script>

@@ -1,0 +1,66 @@
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>提现管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">订单流水记录</div>
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="userwall-table-autowidth" lay-filter="captain-table-autowidth"></table>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn layui-btn-primary" id="fx_sum_price">
+                            <button class="layui-btn layui-btn-primary"  id="tx_sum_price">
+
+                            </button>
+                        </div>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,form = layui.form;
+
+        var router = layui.router();
+        var id = router.search.id;
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+        var tableIns = table.render({
+            elem: '#userwall-table-autowidth'
+            ,url: config.url+'userwallet/detail&id='+id//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                {field:'id', title: '订单ID' , width:150},
+                {field:'pay_price', title: '支付价'},
+                {field:'fx_price', title: '佣金'},
+                {field:'end_time', title: '核销时间' , width:200, templet:function (d) {
+                        return layui.laytpl.toDateString(d.end_time *1000)
+                    }},
+            ]],done:function(res){
+                $('#fx_sum_price').html('<i class="layui-icon">&#xe65e;</i>团长当前佣金：<b style="color: red">' + res.msg.sum_price + '</b>');
+                $('#tx_sum_price').html('<i class="layui-icon">&#xe65e;</i>总提现金额：<b style="color: red">' + res.msg.tx_price + '</b>');
+            }
+        });
+
+    });
+</script>

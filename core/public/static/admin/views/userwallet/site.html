@@ -1,0 +1,149 @@
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">提现设置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+
+            <form class="layui-form" action="" lay-filter="wechatconfig-form">
+
+
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">最低提现</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="pay_config[min_price]" required  lay-verify="required" placeholder="请填写金额" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">手续费</label>
+                    <div class="layui-input-block">
+                        <div class="layui-input-inline">
+                            <input type="text" name="pay_config[diff_price]" lay-verify="required|number" autocomplete="off" placeholder="请填写比列"  class="layui-input">
+                        </div>
+                        <span style="    font-size: 20px;
+    font-weight: 400;
+    line-height: 38px;
+    text-align: right;">%</span>
+                        <!--<input type="text" name="pay_config[diff_price]" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">-->
+                        <!--<blockquote style="color: red" class="layui-elem-quote">* 亲.注意注意!!!：百分比(1 => 1% , 0.1 => 1‰)</blockquote>-->
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">提现方式</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" class="education" name="wechat_config[reflect][3]" lay-filter="reflect"  data-types="type" value="3" title="银行" lay-verify="required">
+                        <input type="checkbox" class="education" name="wechat_config[reflect][1]" lay-filter="reflect"  data-types="type" value="1" title="微信"  lay-verify="required">
+                        <input type="checkbox" class="education" name="wechat_config[reflect][2]" lay-filter="reflect"  data-types="type" value="2" title="支付宝" lay-verify="required" >
+                    </div>
+                    <input type="hidden" name="fonta">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">团长排行</label>
+                    <div  class="layui-input-block">
+                        <input class="search_show" lay-filter="cap_sort" type="radio"  name="wechat_config[cap_sort]" value="0" title="隐藏">
+                        <input class="search_hiden"lay-filter="cap_sort" type="radio"  name="wechat_config[cap_sort]" value="1" title="显示">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="captain-from-edit-submit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin','layer','form' , 'layedit' , 'formSelects'], function() {
+        var $ = layui.$
+            ,admin = layui.admin
+            ,layer = layui.layer
+            ,formSelects = layui.formSelects
+            ,form = layui.form;
+        layui.use('form', function() {
+            form.render();
+        });
+        formSelects.data('cityid', 'server', {
+            url: config.url+'cities/selectlistAll',
+            keyword: '',
+        });
+
+        form.on('checkbox(reflect)',function(data){
+            console.log(data);
+            var len=$(".education:checked").length;
+            if(len<1){
+                layer.msg('最少选1项！',{icon:5});
+                // $(data.elem).next().attr("class","layui-unselect layui-form-checkbox");
+                // $(data.elem).prop("checked",false);
+                return false;
+            }
+        });
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'Userwallet/getSite',//数据接口
+            done:function(res) {
+                if (res.data) {
+                    console.log(res.data)
+                    if(res.data.wechat_config.hope==0||res.data.wechat_config.hope==null){
+                        $('.hid').attr('checked','checked');
+                    }else if(res.data.wechat_config.hope==1){
+                        $('.top').attr('checked','checked');
+                    }else if(res.data.wechat_config.hope==2){
+                        $('.hod').attr('checked','checked');
+                    }
+                    if(res.data.wechat_config.balance_status==0||res.data.wechat_config.hope==null){
+                        $('.open_balance').attr('checked','checked');
+                    }else if(res.data.wechat_config.balance_status==1){
+                        $('.close_balance').attr('checked','checked');
+                    }
+                    if(res.data.wechat_config.cap_sort==0||res.data.wechat_config.cap_sort==null){
+                        $('.search_show').attr('checked','checked');
+                    }else if(res.data.wechat_config.cap_sort==1){
+                        $('.search_hiden').attr('checked','checked');
+                    }
+                    var acr = String(res.data.wechat_config.cright);
+                    //预设元素
+                    form.val("wechatconfig-form", {
+                        "id": res.data.id,// "name": "value"
+                        "pay_config[min_price]"    : res.data.pay_config?res.data.pay_config.min_price:'',// "name": "value"
+                        "pay_config[diff_price]"   : res.data.pay_config?res.data.pay_config.diff_price:'',// "name": "value"
+                        "wechat_config[reflect][3]": res.data.wechat_config.reflect[0]==3?1:0,// "name": "value"
+                        "wechat_config[reflect][1]": res.data.wechat_config.reflect[1]==1?1:0,// "name": "value"
+                        "wechat_config[reflect][2]": res.data.wechat_config.reflect[2]==2?1:0,// "name": "value"
+
+                    });
+
+                }
+            }
+        });
+
+        form.on('submit(captain-from-edit-submit)', function(data){
+
+            $.post(config.url+'Userwallet/balanceSite',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.msg('添加成功! ≥ ▽ ≤', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }
+                });
+            return false;
+        });
+
+
+    });
+</script>

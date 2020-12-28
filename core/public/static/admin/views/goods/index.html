@@ -1,0 +1,294 @@
+
+<title>商品管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>商品管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <!--<div class="layui-card-header">商品管理</div>-->
+                <div class="layui-card-header layui-form layuiadmin-card-header-auto" lay-filter="order-from-search">
+                    <div class="layui-form-item">
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-bottom: 10px;">
+                        搜索：
+                        <div class="layui-inline">
+                            <input class="layui-input" name="search" placeholder="搜索商品名称" id="demoReload" autocomplete="off">
+
+                        </div>
+                        <div class="layui-inline" style="margin-left: -30px">
+                            <label class="layui-form-label">分类</label>
+                            <div class="layui-input-inline" style="width: 150px;">
+                                <select name="cat_id" lay-verify="required" lay-filter="aihao" lay-search="" id="cat_id">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+
+                        <button class="layui-btn" data-type="excel_order">
+                            导出
+                        </button>
+                        <button class="layui-btn" data-type="hsz" style="float:right;">
+                            商品仓库
+                        </button>
+                    </div>
+                    <table class="layui-hide" id="test-goods-table-autowidth" lay-filter="test-goods-table-autowidth"></table>
+                    <!--<table class="layui-hide" id="test-table-recommend" lay-filter="test-goods-table-autowidth"></table>-->
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加
+                            </button>
+                            <!--<button class="layui-btn" data-type="2"  lay-event="checkok">
+                                <i class="layui-icon">&#xe640;</i>删除
+                            </button>-->
+                        </div>
+                    </script>
+
+                    <!--图片-->
+                    <script id="imgAlbum" type="text/html">
+                        <div>
+                            {{# layui.each(d.goods_headimages, function(index, item){ }}
+                                <img src="{{ item }}" width="50px">
+                            {{# }); }}
+                        </div>
+                    </script>
+                    <script type="text/html" id="statusswitchTpl">
+                        <input type="checkbox" name="status" value="{{d.id}}"  lay-skin="switch" lay-text="上架|下架" lay-filter="status" {{ d.status == 0 ? 'checked' : '' }}>
+                    </script>
+                    <!--上下架-->
+                    <script type="text/html" id="switchTpl">
+                        <input type="checkbox" name="recommend" value="{{d.id}}"  lay-skin="switch" lay-text="开启|关闭" lay-filter="recommend" {{ d.recommend == 1 ? 'checked' : '' }}>
+                    </script>
+                    <!--图片-->
+                    <script id="tag_text" type="text/html">
+                        <div>
+                            {{# layui.each(d.tag_text, function(index, item){ }}
+                            <a class="layui-btn layui-btn-normal layui-btn-xs"  lay-event="tag">{{ (item.type == 0) ? '限购' : '满减'  }}</a>
+                            {{# }); }}
+                            {{(d.new_mj==1)?'<a class="layui-btn layui-btn-normal layui-btn-xs"  lay-event="tag">满减</a>':''}}
+                        </div>
+                    </script>
+
+                    <script id="city_text" type="text/html">
+                        <div>
+                            {{# layui.each(d.city_text, function(index, item){ }}
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" >{{ item }}</a>
+                            {{# }); }}
+                        </div>
+                    </script>
+                    <script type="text/html" id="rights">
+                        {{ (d.status == 0) ? '<a class="layui-btn layui-bg-cyan layui-btn-xs " lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>' : '<a class="layui-btn layui-btn-disabled layui-btn-xs"><i class="layui-icon layui-icon-edit"></i>编辑</a>' }}
+                        <!--{{ (d.status == 1) ? '<a class="layui-btn layui-bg-cyan layui-btn-xs " lay-event="edit"><i class="layui-icon layui-icon-edit"></i>删除</a>' : '' }}-->
+                    </script>
+
+                </div>
+            </div>
+            </div> </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin', 'table'], function(){
+        var table    = layui.table;
+        var $        = layui.$
+            ,admin   = layui.admin
+            ,element = layui.element
+            ,layer   = layui.layer
+            ,form    = layui.form;
+        var tableIns = table.render({
+            elem: '#test-goods-table-autowidth'
+            ,url: config.url+'goods/index'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80
+            ,page:true
+            ,cols: [[
+                // {checkbox: true},
+                {field:'id', title: 'ID', width: 80},
+                {field:'goods_name', title: '商品名称', width: 150},
+                {field:'cat_name', title: '分类',width:120},
+                {field:'sort', title: '排序',edit:'text',width:70},
+                {field:'recommend', title: '今日推荐',templet:  '#switchTpl', unresize: true,width:100},
+                {field:'status', title: '状态',templet:  '#statusswitchTpl', unresize: true,width:100},
+                {field:'goods_headimage', title: '封面图' , width: 100  ,templet:'<div><img width="50px" height="25px" src="{{ d.goods_headimage }}"></div>'},
+                {field:'price', title: '活动价',width:80},
+                {field:'stock', title: '库存',width:80},
+                {field:'buy_stock', title: '已售',width:80},
+                {field:'city', title: '城市',templet:'#city_text', align:'center', width: 150},
+                {field:'username', title: '供应商名称',width:150},
+                {field:'tag', title: '标签' , width:100,templet:'#tag_text'},
+                {field:'fx_ratio', title: '佣金比例', width:120 ,templet:function (d) {
+                        return d.fx_ratio+'%';
+                    }},
+                {fixed: 'right', title:'操作', toolbar: '#rights',align: 'center'}
+            ]]
+
+        });
+
+        form.on('switch(status)', function(obj){
+            admin.req({
+                type: 'POST',
+                url: config.url + 'goods/close'//数据接口
+                , data: {
+                    "id": obj.value,
+                },
+                done: function (res) {
+                    layer.msg('操作成功! ~O(∩_∩)O~', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                        ,end:function () {
+                            admin.events.refresh()
+                        }
+                    });
+                }
+            });
+        });
+
+        admin.req({
+            type:'POST',
+            url: config.url+'order/searchInit',//数据接口
+            done:function(res){
+                if(res.data){
+                    var cat      = document.getElementById("cat_id");
+                    var cat_data = res.data.cat;
+                    jsonInit(cat_data,cat);
+                    form.render();
+                }
+            }
+        });
+        function jsonInit(objsons , object) {
+            $.each(objsons,function(idx,obj){
+                object.options.add(new Option(obj,idx));
+
+            });
+        }
+
+        form.on('switch(recommend)', function(obj){
+            admin.req({
+                type: 'POST',
+                url : config.url + 'goods/recommend'//数据接口
+                , data: {
+                    "id": obj.value,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                    });
+                }
+            });
+        });
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+                var cat_id     = $('#cat_id');
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        search: demoReload.val(),
+                        cat_id: cat_id.val()
+                    }
+                });
+            },
+            excel_order:function () {
+                var data         = [];
+                data.demoReload  = $('#demoReload').val();
+                data.cat_id      = $('#cat_id').val();
+                var url          = config.url+'Excel/goodsExcel?demoReload='+data.demoReload+'&cat_id='+data.cat_id;
+                window.location  = url;
+            },
+            hsz:function () {
+                console.log(11)
+                window.location.href =config.html_url+'goods/goods_trash';
+
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+
+        table.on('edit(test-goods-table-autowidth)', function(obj){
+            var id    = obj.data.id;
+            var value = obj.value;
+            admin.req({
+                type: 'POST',
+                url: config.url + 'goods/editsort'//数据接口
+                , data: {
+                    "id"   : id,
+                    "value": value,
+                },
+                done: function (res) {
+                    layer.msg('操作成功!', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 1000
+                        ,end:function () {
+                        }
+                    });
+                }
+            });
+        });
+
+        table.on('tool(test-goods-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                window.location.href =config.html_url+'goods/edit/id='+data.id;
+            }
+        });
+        //监听工具条
+        table.on('toolbar(test-goods-table-autowidth)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            if(obj.event == 'checkok'){
+                var obtype = $(this).data('type');
+                var data = checkStatus.data;
+                if(data == ''){
+                    layer.msg('未选择任何供商品!', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 1000
+                    });
+                    return false;
+                }
+                layer.confirm('您确定要删除选择的商品吗?', function(index){
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'goods/del'//数据接口
+                        , data: {
+                            "id": data,
+                            "type": obtype,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                            });
+                            location.reload();
+                        }
+                    });
+                });
+            }else if(obj.event == 'addcheckok'){
+                window.location.href = config.html_url+'goods/add';
+
+            }
+        });
+
+     });
+</script>

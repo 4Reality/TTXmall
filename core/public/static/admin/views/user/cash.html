@@ -1,0 +1,107 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">余额充值</div>
+        <div class="layui-card-body" style="padding: 15px;">
+
+            <form class="layui-form" action="" lay-filter="captain-from-edit">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户昵称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="username" class="layui-input"  disabled>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">充值金额(元)</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="cash" required  lay-verify="required|number" value="0" placeholder="" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">充值积分</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="integral" required  lay-verify="required|number"  value="0" placeholder="" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">赠送券</label>
+                    <div class="layui-input-block">
+                        <select name="coupon" xm-select="select8"  xm-select-radio xm-select-search="">
+                        </select>
+                    </div>
+                    <blockquote style="margin-left: 110px;color: red" class="layui-elem-quote">不选则不赠送</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="captain-from-edit-submit">立即提交</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin','layer','table','upload', 'form' , 'layedit' , 'formSelects'], function() {
+        var $            = layui.$
+            ,admin       = layui.admin
+            , upload     = layui.upload
+            ,layer       = layui.layer
+            ,layedit     = layui.layedit
+            ,formSelects = layui.formSelects
+            ,form        = layui.form;
+        var table        = layui.table;
+        var router       = layui.router();
+        var id = router.search.id;
+        console.log(id)
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+        admin.req({
+            type:'POST',
+            url: config.url+'user/getUser'//数据接口
+            ,data:{"id":id},
+            done:function(res){
+                console.log(res)
+                if(res.data) {
+                    //预设元素
+                    form.val("captain-from-edit", {
+                        "username": res.data.nickname,
+                    });
+                    formSelects.data('select8', 'server', {
+                        url: config.url+'minus/getAdminCoupon',
+                        keyword: '',
+                    });
+
+                }
+            }
+        });
+        layui.use('form', function() {
+            form.render();
+        });
+
+        /* 监听提交 */
+        form.on('submit(captain-from-edit-submit)', function(data){
+            data.field.id = id;
+            $.post(config.url+'user/recharge',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.alert('充值成功! ≥ ▽ ≤', function(index){
+                            window.parent.layer.closeAll();
+                            window.parent.location.reload()
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            offset: 'auto'
+                            , icon: 2
+                            , time: 2000
+                        })
+                    }
+                });
+            return false;
+        });
+
+    });
+</script>

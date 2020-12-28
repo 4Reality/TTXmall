@@ -1,0 +1,150 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">添加活动</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <!--选项卡-->
+            <div class="layui-tab">
+                <div class="layui-tab-content">
+                    <!--添加活动内容-->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" action="" onsubmit=" return  false" lay-filter="activity-form-group-xcx">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">开始时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="start_time" autocomplete="off" class="layui-input" lay-verify="required" id="start_time" placeholder="请选择活动开始时间">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">结束时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="end_time"  autocomplete="off" class="layui-input" lay-verify="required" id="end_time" placeholder="请选择活动结束时间">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">配送时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="delivery_time" autocomplete="off"  class="layui-input" lay-verify="required" id="delivery_time" placeholder="请选择送达时间">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">订单关闭时间</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="order_end_time" lay-verify="required|number" class="layui-input"  placeholder="请选择订单时间(单位:分钟)">
+                                    <blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">* 亲.注意注意!!!：只能填数字哟(单位：分钟) 此值为未付款订单自动取消时间</blockquote>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">团长自动开启商品</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="open_auto" value="1" lay-skin="switch" lay-text="开启|关闭" checked><blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">开启(关闭)以后将无法修改,请谨慎操作！！！！</blockquote>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter=component-form-group-submit>立即提交</button>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['layer', 'form' , 'laydate'], function(){
+        //定义表单
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,laydate = layui.laydate
+            ,form = layui.form;
+        //常规用法
+        laydate.render({
+            elem: '#start_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+        });
+        //常规用法
+        laydate.render({
+            elem: '#end_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+        });
+
+        //配送日期
+        laydate.render({
+            elem: '#delivery_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd H:m:s'
+            ,done: function(value, date){
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/checkDelt', //数据接口
+                    data: {dtime:value},
+                    done: function (res) {
+                        if(res.data == -2001){
+                            layer.msg('配送时间不能重复喔! ≥...≤!~', {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                            });
+                            $('#delivery_time').val('')
+                        }
+                    }
+                });
+            }
+        });
+
+        //监听提交
+        form.on('submit(component-form-group-submit)', function(data){
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'activity/add', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data != true){
+                        var msg = '';
+                        switch(res.data){
+                            case -2001:
+                                msg = '该时间段 已有团购活动，请填写新的团购活动日期! ≥...≤!~ ';
+                                break;
+                            case -2002:
+                                msg = '哎呀,活动只能创建两期喔! ≥...≤!~ ';
+                                break;
+                            case -2003:
+                                msg = '亲,开始时间不能小于结束时间哟! ≥...≤!~ ';
+                                break;
+                            case -2004:
+                                msg = '配送时间不能小于结束时间哟! ≥...≤!~ ';
+                                break;
+                            case -2005:
+                                msg = '添加失败,请重试! ≥...≤!~';
+                                break;
+                        }
+                        layer.msg(msg, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }else{
+                        layer.msg('添加成功啦! ≥ ▽ ≤', {
+                            offset: 'auto'
+                            , icon: 1
+                            , time: 1000
+                            ,end:function () {
+                                window.parent.layer.closeAll();
+                                window.parent.location.reload()
+                            }
+                        })
+                    }
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,156 @@
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>配送时间段管理</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">配送时间段管理</div>
+        <div class="layui-card-body">
+
+          <!--<blockquote style="margin-top: 2px; color: red;" class="layui-elem-quote">* 亲.注意注意!!!城市不能删除哟!</blockquote>-->
+          <table class="layui-hide" id="delivery-table-autowidth" lay-filter="delivery-table-autowidth"></table>
+
+          <script type="text/html" id="toolbar">
+            <div class="layui-btn-container">
+              <button class="layui-btn"  lay-event="addcheckok">
+                <i class="layui-icon">&#xe654;</i>添加
+              </button><!--
+              <button class="layui-btn"  lay-event="delcheckok">
+                  <i class="layui-icon">&#xe640;</i>删除
+              </button>-->
+            </div>
+          </script>
+
+          <script type="text/html" id="rights">
+            <a class="layui-btn layui-bg-cyan layui-btn-xs " lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+            <a class="layui-btn layui-bg-red layui-btn-xs"  lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,laydate = layui.laydate
+            ,layer = layui.layer
+            ,form = layui.form;
+
+        var tableIns = table.render({
+            elem: '#delivery-table-autowidth'
+            ,url: config.url+'order/deliverySite'//数据接口
+            ,toolbar: '#toolbar'
+            ,defaultToolbar:[]
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                {field:'start_time', title: '开始时间' , align:'center'},
+                {field:'end_time', title: '结束时间', align:'center'},
+                {fixed: 'right', title:'操作', toolbar: '#rights', width:160}
+            ]]
+        });
+        table.on('tool(delivery-table-autowidth)', function(obj){
+            var data = obj.data;
+            if(obj.event == 'del'){
+                layer.confirm('您确定要删除此配送时间段吗?', function(index){
+                    layer.close(index);
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'order/delDelivery'//数据接口
+                        , data: {
+                            "id": data.id,
+                        },
+                        done: function (res) {
+                            if(res.data != 200){
+                                strs =
+                                    (res.data == -2001) ?  '<b style="color: red;">≥...≤!~ 糟糕,没找到数据!</b>' : '<b style="color: red;">≥...≤!~ 糟糕,删除失败啦!</b>';
+                                layer.alert(strs, {icon: 2});
+                                return false
+                            }else{
+                                obj.del();
+                                layer.msg('O(∩_∩)O~ 删除成功!', {
+                                    offset: '15px'
+                                    , icon: 1
+                                });
+                            }
+                        }
+                    });
+                });
+            }else if(obj.event == 'edit'){
+                layer.open({
+                    type: 2
+                    ,title: '编辑配送时间段' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['600px', '640px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'LAY_editdly'
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.html_url+'order/editDelivery/id='+data.id
+                });
+            }
+        });
+        //监听工具条
+        table.on('toolbar(delivery-table-autowidth)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            /*if(obj.event == 'checkok'){
+                var obtype = $(this).data('type');
+                var data = checkStatus.data;
+                if(data == ''){
+                    layer.msg('未选择任何城市!', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 1000
+                    });
+                    return false;
+                }
+                layer.confirm('您确定要删除选择的城市吗?', function(index){
+                    //掉删除接口
+                    admin.req({
+                        type: 'POST',
+                        url: config.url + 'cities/del'//数据接口
+                        , data: {
+                            "id": data,
+                        },
+                        done: function (res) {
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                            });
+                            location.reload();
+                        }
+                    });
+
+                });
+            }else */if(obj.event == 'addcheckok'){
+                layer.open({
+                    type: 2
+                    ,title: '添加配送时间段' //不显示标题栏
+                    ,closeBtn: false
+                    ,area:  ['600px', '640px']
+                    ,shade: 0.8
+                    ,shadeClose : true
+                    ,id: 'LAY_adddellayuipro'
+                    ,btnAlign: 'c'
+                    ,moveType: 1 //拖拽模式，0或者1
+                    ,content: config.html_url+'order/addDelivery'
+                });
+            }
+        });
+
+    });
+</script>

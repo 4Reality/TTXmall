@@ -1,0 +1,129 @@
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="demoTable" style="margin-left: 60%;">
+                        搜索ID：
+                        <div class="layui-inline">
+                            <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload">搜索</button>
+                    </div>
+                    <table class="layui-hide" id="test-table-autowidth" lay-filter="test-table-autowidth"></table>
+                    <script type="text/html" id="toolbar">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="1"  lay-event="addcheckok">
+                                <i class="layui-icon">&#xe654;</i>添加
+                            </button>
+                        </div>
+                    </script>
+
+                    <script id="tag_text" type="text/html">
+                        <div>
+                            {{# layui.each(d.tag_text, function(index, item){ }}
+                            <a class="layui-btn layui-btn-normal layui-btn-xs"  lay-event="tag">{{ item.tag_name }}</a>
+                            {{# }); }}
+                        </div>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['admin', 'table'], function(){
+        var table = layui.table;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,layer = layui.layer
+            ,form = layui.form;
+
+        var tableIns = table.render({
+            elem: '#test-table-autowidth'
+            ,url: config.url+'activity/goods'//数据接口
+            ,toolbar: '#toolbar'
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,page:true
+            ,cols: [[
+                {checkbox: true},
+                {field:'id', title: 'ID', sort: true},
+                {field:'goods_name', title: '商品名称' , width:150},
+                {field:'init_price', title: '原价'},
+                {field:'price', title: '活动价'},
+                {field:'stock', title: '库存'},
+                {field:'buy_stock', title: '已售'},
+                {field:'tag', title: '标签' , width:100,templet:'#tag_text'},
+                {field:'fx_ratio', title: '分销比例', width:100},
+                {field:'norms', title: '规格'},
+            ]]
+        });
+        active  = {
+            reload: function(){
+                var demoReload = $('#demoReload');
+
+                //执行重载
+                tableIns.reload( {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        id: demoReload.val()
+                    }
+                });
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('toolbar(test-table-autowidth)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            if(obj.event == 'addcheckok'){
+                var data = checkStatus.data;
+                if(data == ''){
+                    layer.msg('未选择任何商品!', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 1000
+                    });
+                    return false;
+                }
+                //掉删除接口
+                admin.req({
+                    type: 'POST',
+                    url: config.url + 'activity/addGoods'//数据接口
+                    , data: {
+                        "gid": data,
+                    },
+                    done: function (res) {
+                        console.log(res)
+                        if(res.code == 0){
+                            layer.msg('操作成功!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                            }, function(){
+                                window.parent.layer.closeAll();
+                                window.parent.location.reload()
+                            });
+                        }else{
+                            layer.alert('添加失败!', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 2000
+                            });
+                        }
+
+                    }
+                });
+            }
+        });
+
+    });
+</script>

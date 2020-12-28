@@ -1,0 +1,157 @@
+<style>
+  .goods_imgsd{
+    display: flex;
+  }
+  .goods_imgsd dd {
+    margin-left: 3px;
+  }
+</style>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">供应商订单信息</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form layui-form-pane" action="" onsubmit=" return  false" lay-filter="component-form-group-supplier">
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">货单号</label>
+          <div class="layui-input-block">
+            <input type="text" name="cargos_code" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">供应商</label>
+          <div class="layui-input-block">
+            <input type="text" name="supplier" disabled placeholder="" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">配送时间</label>
+          <div class="layui-input-block">
+            <input type="text" name="delivery_time" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">联系电话</label>
+          <div class="layui-input-block">
+            <input type="text" name="mobile" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item" pane>
+          <label class="layui-form-label">商品总数</label>
+          <div class="layui-input-block">
+            <input type="text" name="goods_count" disabled autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <table class="layui-hide" id="demo"></table>
+
+        <div class="layui-form-item" id="order-buttons" style="text-align: center">
+          <div class="layui-input-block"  style="margin-left: 0; margin-top: 5px;">
+            <button class="layui-btn layui-btn-lg" lay-submit lay-filter="order-form-captainprinter-submit">打印</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    layui.use(['admin','layer','table','upload', 'form' , 'layedit'], function() {
+        var $ = layui.$
+            ,admin = layui.admin
+            , upload = layui.upload
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,form = layui.form;
+
+        var table = layui.table;
+        var router = layui.router();
+        var id = router.search.id;
+        if(typeof(id)=='undefined'){
+            id=0;//默认新增
+        }
+
+        table.render({
+            elem: '#demo'
+            ,url: config.url+'order/readGoods'//数据接口
+            ,where:{
+              'type':2,
+              'id':id
+            }
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [[
+                {field:'goods_name', title: '商品名称'}
+                ,{field:'price', title: '商品单价'}
+                ,{field:'city', title: '商品城市'}
+                ,{field:'goods_num', title: '购买数量'}
+                ,{field:'norms', title: '商品规格'}
+            ]]
+        });
+        admin.req({
+            type:'POST',
+            url: config.url+'order/supplierOrderDetail'//数据接口
+            ,data:{"id":id},
+            done:function(res){
+                if(res.data){
+                    //预设元素
+                    form.val("component-form-group-supplier", {
+                        "cargos_code": res.data.cargos_code,
+                        "supplier": res.data.sup_id.username,
+                        "delivery_time": layui.laytpl.toDateString(res.data.delivery_time *1000),
+                        "mobile": res.data.sup_id.mobile,
+                        "goods_count": res.data.goods_count,
+                    });
+                }
+            }
+        });
+        layui.use('form', function() {
+            form.render();
+        });
+
+        /* 监听提交 */
+        form.on('submit(order-form-captainprinter-submit)', function(data){
+            data.field.id = id;
+            data.field.printer = 3;
+            //发送请求
+            admin.req({
+                type:'POST',
+                url: config.url+'order/printer', //数据接口
+                data:data.field,
+                done:function(res){
+                    if(res.data.code != true){
+                        var msg = '';
+                        switch(res.data.msg){
+                            case -1:
+                                msg = '打印配置有误:接口名称错误';
+                                break;
+                            case -2:
+                                msg = '打印配置有误:该帐号未注册';
+                                break;
+                            case -3:
+                                msg = '打印配置有误:签名错误';
+                                break;
+                            case 1001:
+                                msg = '打印配置有误:打印机编号不合法';
+                                break;
+                        }
+                        layer.msg(msg, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }else{
+                        layer.msg('打印成功啦! ≥ ▽ ≤', {
+                            offset: 'auto'
+                            , icon: 1
+                            , time: 1000
+                            ,end:function () {
+                                window.parent.layer.closeAll();
+                                window.parent.location.reload()
+                            }
+                        })
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+

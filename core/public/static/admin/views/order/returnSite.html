@@ -1,0 +1,111 @@
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">订单设置</div>
+        <div class="layui-card-body" style="padding: 15px;">
+
+            <form class="layui-form" action="" lay-filter="wechatconfig-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">售后设置</label>
+                    <div  class="layui-input-block">
+                        <input class="hid" lay-filter="refund_site" type="radio"  name="site" value="0" title="自动退款">
+                        <input class="top" lay-filter="refund_site" type="radio"  name="site" value="1" title="手动退款">
+                    </div>
+                    <!--<blockquote style="margin-left: 7rem;" class="layui-elem-quote" id="notice"></blockquote>-->
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">核销时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="end_hx_time" lay-verify="required|number" autocomplete="off" class="layui-input">
+                    </div>
+                    <span style="font-size: 16px;
+    font-weight: 400;
+    line-height: 38px;
+    text-align: right;">天</span>
+                    <blockquote style="margin-left: 7rem;color: red" class="layui-elem-quote" id="notice">订单收货后，在设置时间后订单将自动核销</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">起送金额</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="much_price" lay-verify="required|number" autocomplete="off" class="layui-input">
+                    </div>
+                    <span style="font-size: 16px;
+    font-weight: 400;
+    line-height: 38px;
+    text-align: right;">元</span>
+                    <blockquote style="margin-left: 7rem;color: red" class="layui-elem-quote" id="much_price">付款金额要大于等于配送金额才能配送（填0不限制）</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="captain-from-edit-submit">立即提交</button>
+                        <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    layui.use(['admin','layer','form' , 'layedit' , 'formSelects'], function() {
+        var $            = layui.$
+            ,admin       = layui.admin
+            ,layer       = layui.layer
+            ,formSelects = layui.formSelects
+            ,form        = layui.form;
+        layui.use('form', function() {
+            form.render();
+        });
+        //查询配置
+        admin.req({
+            type:'POST',
+            url: config.url+'Order/refundSite',//数据接口
+            done:function(res) {
+                if (res.data) {
+                    console.log(res.data)
+                    if(res.data.refund_site==0||res.data.refund_site==null){
+                        $('.hid').attr('checked','checked');
+                    }else if(res.data.refund_site==1){
+                        $('.top').attr('checked','checked');
+                    }
+
+                    //预设元素
+                    form.val("wechatconfig-form", {
+                        "id": res.data.id,
+                        "end_hx_time": res.data.end_hx_time,
+                        "much_price" : res.data.much_price,
+
+                    });
+
+                }
+            }
+        });
+
+        form.on('submit(captain-from-edit-submit)', function(data){
+
+            $.post(config.url+'Order/refundSite',
+                data.field,
+                function(res){
+                    if(res.code == 0){
+                        layer.msg('添加成功! ≥ ▽ ≤', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        });
+                    }else{
+                        layer.msg(res.data, {
+                            offset: '15px'
+                            , icon: 2
+                            , time: 2000
+                        });
+                    }
+                });
+            return false;
+        });
+
+
+    });
+</script>
